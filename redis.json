@@ -1,0 +1,419 @@
+{
+  "name": "Top200Projects",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const tweets = $json.data || [];\n\nif (!tweets.length) {\n  return [{ isNew: false, reason: \"No tweets found\" }];\n}\n\n// Map all tweets to return array of objects\nreturn tweets.map(tweet => ({\n  id: tweet.id,\n  text: tweet.text,\n  isNew: true // mark all as \"new\" for now, you will filter later\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1420,
+        260
+      ],
+      "id": "cac8afe9-000d-4981-b53d-0f7f9dbfb8a7",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "lastId",
+        "key": "lastId",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1180,
+        240
+      ],
+      "id": "397baad1-95d1-4558-9f4d-2a918de0031c",
+      "name": "Redis"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "be78e3a2-0524-4720-b85b-56e5450adb1a",
+              "leftValue": "={{ $json.lastId }}",
+              "rightValue": "={{ $('HTTP Request1').item.json.data[0].id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -960,
+        240
+      ],
+      "id": "a13a43d7-e527-434e-a45a-925e4c4d9b5e",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        140
+      ],
+      "id": "b117a69d-eb37-4a9f-a7f7-137620d431c3",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "lastId",
+        "value": "={{ $('HTTP Request1').item.json.data[0].id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        340
+      ],
+      "id": "064c0fd4-5144-4313-942a-86984261b094",
+      "name": "Redis1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        560
+      ],
+      "id": "a7cb6988-b301-407f-817d-842452db73a2",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sendTo": "fejirohanu@gmail.com, hilaryohpsinternng@gmail.com",
+        "subject": "🚨 Market Alert from Watcher.Guru",
+        "message": "=👉 {{ $('HTTP Request1').item.json.data[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        76,
+        440
+      ],
+      "id": "9b836166-0433-44f8-9217-9a484c39f8ee",
+      "name": "Gmail",
+      "webhookId": "cfd01e80-80d2-4757-bb90-41ae95cbe5d0"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        76,
+        640
+      ],
+      "id": "baedf871-8ddc-4116-8093-14ecabebf6c1",
+      "name": "Execution Data1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1343163917647482961",
+          "mode": "list",
+          "cachedResultName": "sweep",
+          "cachedResultUrl": "https://discord.com/channels/1343163917647482961"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1352063656158035968",
+          "mode": "list",
+          "cachedResultName": "truth",
+          "cachedResultUrl": "https://discord.com/channels/1343163917647482961/1352063656158035968"
+        },
+        "content": "=🚨 **Market Alert from Watcher.Guru**\n\n👉 **{{ $('HTTP Request1').item.json.data[0].text }}**\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        76,
+        240
+      ],
+      "id": "dba4e1b9-ee45-4858-9712-de26891b7cd4",
+      "name": "Discord",
+      "webhookId": "fc435405-97bc-482c-89b9-470368bd7481"
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=🚨 **Market Alert from Watcher.Guru**  \n\n👉 **{{ $('HTTP Request1').item.json.data[0].text }}**",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        76,
+        40
+      ],
+      "id": "19f2b706-1ee7-4be1-b986-e97928bf2d41",
+      "name": "Telegram",
+      "webhookId": "3e2098ec-28af-4d59-b02b-b84ebee34a5f"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1840,
+        260
+      ],
+      "id": "69a4bb3e-daad-4037-bb38-e81d4b0f0099",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0800f44c-c32c-4873-99e2-2ac873e814d3",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        340
+      ],
+      "id": "c4bfb7f8-6424-45d1-bcea-9203d3cfa02d",
+      "name": "TruthGate"
+    },
+    {
+      "parameters": {
+        "url": "https://api.twitter.com/2/lists/1910005686173663459/tweets",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=max_results",
+              "value": "=1"
+            },
+            {
+              "name": "=tweet.fields",
+              "value": "=created_at,author_id,text"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer AAAAAAAAAAAAAAAAAAAAABT%2B0AEAAAAACK%2FN9c%2B2Xkb47%2FkOqjNBWi2eZVk%3DZPANAUvSPFxjdSlfmnkmyMFEOYbsI5HWEimIbDrQFOU30LnUiG"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1620,
+        240
+      ],
+      "id": "fe664ee9-56f9-46e5-8568-e220b82a201d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        -520,
+        340
+      ],
+      "id": "efe4904e-3ddf-485c-a27b-6f4f97a93b6d",
+      "name": "Basic LLM Chain"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TruthGate": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execution Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "TruthGate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "34fe9bf6-e1cd-482d-842f-0d24aa523855",
+  "meta": {
+    "instanceId": "9d0cf35b634a2c2c616de21968ef1aadd98bc0b64471988db30f04c74d09e31d"
+  },
+  "id": "dGpjbRfjFg7v1QiR",
+  "tags": []
+}

@@ -1,0 +1,386 @@
+{
+  "name": "TruthListenTest",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        420
+      ],
+      "id": "571bb21f-8079-46d9-abb8-018defe69606",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9xKJjJzDpFbc0F5Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "1d54b376-b624-41e0-acb0-1e26d87eb61c",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "Okay, I understand. I will analyze Trump's Truth posts based on your criteria and provide the requested output format.",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        600,
+        200
+      ],
+      "id": "c18c5288-106a-481a-adaf-39de1c6b256f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1372033341439873175",
+          "mode": "list",
+          "cachedResultName": "trump",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1372033341439873175"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        820,
+        300
+      ],
+      "id": "1fa4ce44-ab03-4e38-aa40-87dc5617fd05",
+      "name": "Discord",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "NKKMgALxrR178Vvm",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate Crypto Analyst. Analyze posts below from Trump's Truth account. Only analyze posts that explicitly mention specific crypto tokens or coins by name or ticker in a meaningful context.\n\nIgnore posts that are:\nPurely celebratory (e.g., “Bitcoin hit $100,000!”).\nGeneral sentiment or milestone announcements without projections or impacts on tokens.\n\nPost: {{ $json.latestPost }}\n\nInstructions:\nDetermine Relevance:\nOnly proceed if the post contains explicit mentions of specific tokens/coins by name or ticker (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL) and discusses projections, impacts, or meaningful context.\n\nIgnore posts that are about:\nGeneral crypto news.\nCelebrations or milestones (e.g., “Bitcoin hit $100,000!”).\nBroad sentiment or commentary without actionable or meaningful token impacts.\n\n***If no token or coin is clearly mentioned with meaningful context, output only: \"No_Impact\" and nothing else.****\n\nAnalyze Sentiment for Relevant Posts:\n\nIf the post is relevant:\nProvide a concise summary of the post’s impact on the mentioned token(s).\nList each token ticker explicitly mentioned.\nAssign sentiment: BULLISH for positive impacts or projections, BEARISH for negative impacts or concerns.\n\nOutput (in Plain Text Only), ***if the post is relevant***:\n**Trump's Truth**\nMarket Overview: [Token-specific summary, describing projections or impacts.]\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nand nothing else.\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        220,
+        200
+      ],
+      "id": "d992c66a-34eb-4870-a599-09c1161fdb41",
+      "name": "Analyst"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.latestPost }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -220,
+        100
+      ],
+      "id": "1ada0958-ee0e-4e69-95ba-5a32ef21f017",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "25dcf67d-6b0f-4bd0-aa01-fedfb8dccedf",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        820,
+        100
+      ],
+      "id": "d68262e9-f772-4a46-859e-41339e6a464a",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.postUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "id": "9291f31c-a230-46aa-8e19-8c5507e2fe59",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/receive-post",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        560
+      ],
+      "id": "eb1ad690-12ce-4d42-8e99-31e3dfac13b5",
+      "name": "Webhook1",
+      "webhookId": "35639817-bb26-47ee-b6f4-883ebdb9ce4e",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer fc-0daf1e5f9d5f43d1913db0a570bc728f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://truthsocial.com/@xai711\",\n  \"formats\": [\n    \"markdown\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -660,
+        100
+      ],
+      "id": "12da3a17-8522-480f-8649-711a555f1872",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw markdown from the input item\nconst markdown = $json[\"data\"][\"markdown\"];\n\n// Use a regex to extract all posts with text and links\nconst postRegex = /· \\[(\\d+[dhm]?|[A-Za-z]+\\s\\d+)\\]\\((https:\\/\\/truthsocial\\.com\\/@[^)]+)\\)\\s*\\n\\n([^[]+)/g;\n\nlet posts = [];\nlet match;\n\n// Extract all posts\nwhile ((match = postRegex.exec(markdown)) !== null) {\n  posts.push({\n    timestamp: match[1],\n    url: match[2],\n    content: match[3].trim(),\n  });\n}\n\n// Return only the latest post (first match)\nif (posts.length > 0) {\n  return [\n    {\n      json: {\n        latestPost: posts[0].content,\n        postUrl: posts[0].url,\n        timestamp: posts[0].timestamp,\n      },\n    },\n  ];\n} else {\n  return [\n    {\n      json: {\n        error: \"No posts found\",\n      },\n    },\n  ];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        100
+      ],
+      "id": "f5ff6835-26ff-45ea-b25a-46d5b03655b4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        100
+      ],
+      "id": "25f19d14-33d6-4f73-9377-1c3b3da4c5b8",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "82d2b0b8-07e9-4a89-92a8-1f79ee373016",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bd3fb2445c8d5240ef1fe92cf193d7e05c0fe42313f2bfa7af5644dbeaa225be"
+  },
+  "id": "B1iyPkOcV6Sk7bIw",
+  "tags": []
+}

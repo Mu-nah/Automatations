@@ -1,0 +1,930 @@
+{
+  "name": "xaiAnalysis",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -320,
+        -380
+      ],
+      "id": "39ed5b46-0a2d-4eae-9951-1d4bef2f6442",
+      "name": "Telegram Trigger",
+      "webhookId": "a1bf5cd3-e3db-4c10-9df9-068bc4a008fa",
+      "credentials": {
+        "telegramApi": {
+          "id": "lmFPcWpcAnt1PznK",
+          "name": "papertest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const message = $json.message?.text || ''; // your Telegram message\nconst parts = message.split(',');\n\nif (parts.length !== 5) {\n  throw new Error('Invalid message format. Use: DIRECTION, TICKER, AMOUNT, DATE, TIME WAT');\n}\n\nconst direction = parts[0].trim();\nconst ticker = parts[1].trim();\nconst amount = parts[2].trim();\nconst date = parts[3].trim();\nconst timeWAT = parts[4].replace('WAT', '').trim();\n\n// Convert WAT (UTC+1) to UTC\nconst dateTimeWAT = new Date(`${date}T${timeWAT}:00+01:00`);\nconst timestampUTC = dateTimeWAT.toISOString();\nconst timestampMillis = dateTimeWAT.getTime(); // Unix timestamp in milliseconds\n\nreturn [\n  {\n    json: {\n      direction,\n      ticker,\n      amount,\n      wat_time: `${date} ${timeWAT}`,\n      utc_time: timestampUTC,\n      start_timestamp_ms: timestampMillis\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -380
+      ],
+      "id": "a1522648-7ab6-4f49-9570-f00cf63cd0c8",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "https://api.binance.us/api/v3/klines",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=symbol",
+              "value": "={{ $json.ticker }}"
+            },
+            {
+              "name": "=interval",
+              "value": "=1m"
+            },
+            {
+              "name": "=startTime",
+              "value": "={{ $json.start_timestamp_ms }}"
+            },
+            {
+              "name": "limit",
+              "value": "200"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        -380
+      ],
+      "id": "aeeb8fa9-f86b-45e4-9950-0e0fba9decbf",
+      "name": "1m chart",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"timeframe\": \"1m\",\n  \"candles\": {{$json}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        340,
+        -380
+      ],
+      "id": "7de5e0cf-3be4-4e81-a118-7fb4b985c76c",
+      "name": "1m Candle"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7def3462-938a-4c03-ac93-944485736c25",
+              "leftValue": "={{ $json.candles.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -380
+      ],
+      "id": "5a504a45-c636-45cf-beca-53bca7881f30",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "https://bybit-kline-proxyz.onrender.com/klines",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "symbol",
+              "value": "={{ $('Code').item.json.ticker }}"
+            },
+            {
+              "name": "interval",
+              "value": "1"
+            },
+            {
+              "name": "start",
+              "value": "={{ $('Code').item.json.start_timestamp_ms }}"
+            },
+            {
+              "name": "limit",
+              "value": "500"
+            },
+            {
+              "name": "category",
+              "value": "linear"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        -580
+      ],
+      "id": "24286413-bdfe-4bda-bc18-7da8a95df947",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "jsCode": "const token = $('Code').first().json.ticker || \"Unknown\";\n\n// Config\nconst direction = $('Code').first().json.direction; // or \"SHORT\"\nconst riskUSD = parseFloat($('Code').first().json.amount);\nconst FIFTEEN_MINUTES = 15 * 60 * 1000;\n\n// Flatten and sort candles\nconst allCandles = items\n  .map(i => Array.isArray(i.json.candles) ? [i.json.candles] : []) // Extract candles if they exist\n  .flat()\n  .map(candle => [\n    parseFloat(candle[0]), // Timestamp\n    parseFloat(candle[1]), // Open price\n    parseFloat(candle[2]), // High price\n    parseFloat(candle[3]), // Low price\n    parseFloat(candle[4])  // Close price\n  ])\n  .sort((a, b) => a[0] - b[0]); // Sort by timestamp\n\nif (allCandles.length === 0) {\n  return [{ json: { error: \"No candle data\" } }];\n}\n\n// Entry candle\nconst entryCandle = allCandles[0];\nconst entryTime = entryCandle[0];\nconst entryPrice = entryCandle[1];\n\nlet closePrice = entryPrice;\nlet closeTime = entryTime;\nlet status = \"Still Trading\"; // Default status\nlet isCompleted = false; // Tracks whether the full 15-minute window is analyzed\n\n// Variables to track drawdown\nlet drawdownReference = entryPrice;\n\n// Analyze candles for 15 minutes after entry\nfor (const candle of allCandles) {\n  const [time, open, high, low, close] = candle;\n  const timestamp = time;\n\n  if (timestamp <= entryTime) continue;\n  if (timestamp > entryTime + FIFTEEN_MINUTES) break;\n\n  // Track drawdown based on direction\n  if (direction === \"LONG\") {\n    drawdownReference = Math.min(drawdownReference, low);\n  } else {\n    drawdownReference = Math.max(drawdownReference, high);\n  }\n\n  // Update the closing price to the most recent candle\n  closePrice = close;\n  closeTime = timestamp;\n\n  // If the 15th-minute mark is reached, update status\n  if (timestamp === entryTime + FIFTEEN_MINUTES) {\n    isCompleted = true;\n    status = \"15-Minute Analysis Complete\";\n  }\n}\n\n// If the 15-minute mark was not reached, keep status as \"Still Trading\"\nif (!isCompleted) {\n  status = \"Still Trading\";\n}\n\n// Calculate PnL\nconst pnlPct = direction === \"LONG\"\n  ? ((closePrice - entryPrice) / entryPrice) * 100\n  : ((entryPrice - closePrice) / entryPrice) * 100;\n\nconst gainUSD = (pnlPct / 100) * riskUSD;\nconst currentAmountUSD = riskUSD + gainUSD;\n\n// Calculate max drawdown\nconst maxDrawdown = direction === \"LONG\"\n  ? ((drawdownReference - entryPrice) / entryPrice) * 100\n  : ((entryPrice - drawdownReference) / entryPrice) * 100;\n\n// Output result\nreturn [\n  {\n    json: {\n      EntryTime: new Date(entryTime + 60 * 60 * 1000).toISOString().replace(\"T\", \" \").replace(\"Z\", \" WAT\"),\n      Token: token,\n      Direction: direction,\n      EntryPrice: entryPrice.toFixed(4),\n      ClosePrice: closePrice.toFixed(4),\n      CloseTime: new Date(closeTime + 60 * 60 * 1000).toISOString().replace(\"T\", \" \").replace(\"Z\", \" WAT\"),\n      Status: status,\n      PnLPercentage: pnlPct.toFixed(3),\n      GainUSD: gainUSD.toFixed(3),\n      CurrentAmountUSD: currentAmountUSD.toFixed(4),\n      MaxDrawdown: maxDrawdown.toFixed(3)\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        -80
+      ],
+      "id": "044f10e3-c5a7-4066-81d6-88ad58a816bd",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"timeframe\": \"1m\",\n  \"candles\": {{$json}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        -480
+      ],
+      "id": "a9317b70-3a33-44b3-8d44-a00923b7402b",
+      "name": "1m Candle1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const token = $('Code').first().json.ticker || \"Unknown\";\n\n\n// Config\nconst direction = $('Code').first().json.direction; // or \"SHORT\"\nconst riskUSD = parseFloat($('Code').first().json.amount);\nconst FIFTEEN_MINUTES = 15 * 60 * 1000;\n\n// Flatten and sort candles\nconst allCandles = items\n  .map(i => i.json.candles?.result?.list || [])\n  .flat()\n  .map(candle => candle.map(parseFloat))\n  .sort((a, b) => a[0] - b[0]);\n\nif (allCandles.length === 0) {\n  return [{ json: { error: \"No candle data\" } }];\n}\n\n// Entry candle\nconst entryCandle = allCandles[0];\nconst entryTime = entryCandle[0];\nconst entryPrice = entryCandle[1];\n\nlet closePrice = entryPrice;\nlet closeTime = entryTime;\nlet status = \"Still Trading\"; // Default status\nlet isCompleted = false; // Tracks whether the full 15-minute window is analyzed\n\n// Variables to track drawdown\nlet drawdownReference = entryPrice;\n\n// Analyze candles for 15 minutes after entry\nfor (const candle of allCandles) {\n  const [time, open, high, low, close] = candle;\n  const timestamp = time;\n\n  if (timestamp <= entryTime) continue;\n  if (timestamp > entryTime + FIFTEEN_MINUTES) break;\n\n  // Track drawdown based on direction\n  if (direction === \"LONG\") {\n    drawdownReference = Math.min(drawdownReference, low);\n  } else {\n    drawdownReference = Math.max(drawdownReference, high);\n  }\n\n  // Update the closing price to the most recent candle\n  closePrice = close;\n  closeTime = timestamp;\n\n  // If the 15th-minute mark is reached, update status\n  if (timestamp === entryTime + FIFTEEN_MINUTES) {\n    isCompleted = true;\n    status = \"15-Minute Analysis Complete\";\n  }\n}\n\n// If the 15-minute mark was not reached, keep status as \"Still Trading\"\nif (!isCompleted) {\n  status = \"Still Trading\";\n}\n\n// Calculate PnL\nconst pnlPct = direction === \"LONG\"\n  ? ((closePrice - entryPrice) / entryPrice) * 100\n  : ((entryPrice - closePrice) / entryPrice) * 100;\n\nconst gainUSD = (pnlPct / 100) * riskUSD;\nconst currentAmountUSD = riskUSD + gainUSD;\n\n// Calculate max drawdown\nconst maxDrawdown = direction === \"LONG\"\n  ? ((drawdownReference - entryPrice) / entryPrice) * 100\n  : ((entryPrice - drawdownReference) / entryPrice) * 100;\n\n// Output result\nreturn [\n  {\n       json: {\n      EntryTime: new Date(entryTime + 60 * 60 * 1000).toISOString().replace(\"T\", \" \").replace(\"Z\", \" WAT\"),\n      Token: token,\n      Direction: direction,\n      EntryPrice: entryPrice.toFixed(4),\n      ClosePrice: closePrice.toFixed(4),\n      CloseTime: new Date(closeTime + 60 * 60 * 1000).toISOString().replace(\"T\", \" \").replace(\"Z\", \" WAT\"),\n      Status: status,\n      PnLPercentage: pnlPct.toFixed(3),\n      GainUSD: gainUSD.toFixed(3),\n      CurrentAmountUSD: currentAmountUSD.toFixed(4),\n      MaxDrawdown: maxDrawdown.toFixed(3)\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        -480
+      ],
+      "id": "bf424263-6f34-40f2-8c45-88c8f4543b6e",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=📊 *Trade Summary from {{ $json.EntryTime }}*:\n\n🪙 *Token:* {{ $json.Token }}\n📈 *Direction:* {{ $json.Direction }}\n💰 *Entry Price:* ${{ $json.EntryPrice }}\n\n📉 *Close Price:* ${{ $json.ClosePrice }}\n⏱ *Close Time (WAT):* {{ $json.CloseTime }}\n🚦 *Status:* {{ $json.Status }}\n\n📊 *PnL:* {{ $json.PnLPercentage }}%\n💵 *Gain/Loss:* ${{ $('Code2').item.json.CurrentAmountUSD }}\n📉 *Max Drawdown:* {{ $json.MaxDrawdown }}%\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        -480
+      ],
+      "id": "40b3f4c1-1870-4883-85d9-35974946c534",
+      "name": "Telegram",
+      "webhookId": "4ae4c886-49ee-4278-91e1-1d7567c886af",
+      "credentials": {
+        "telegramApi": {
+          "id": "lmFPcWpcAnt1PznK",
+          "name": "papertest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=📊 *Trade Summary from {{ $json.EntryTime }}*:\n\n🪙 *Token:* {{ $json.Token }}\n📈 *Direction:* {{ $json.Direction }}\n💰 *Entry Price:* ${{ $json.EntryPrice }}\n\n📉 *Close Price:* ${{ $json.ClosePrice }}\n⏱ *Close Time (WAT):* {{ $json.CloseTime }}\n🚦 *Status:* {{ $json.Status }}\n\n📊 *PnL:* {{ $json.PnLPercentage }}%\n💵 *Gain/Loss:* ${{ $('Code1').item.json.CurrentAmountUSD }}\n📉 *Max Drawdown:* {{ $json.MaxDrawdown }}%\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        -280
+      ],
+      "id": "7d341f8c-8f52-4d13-a517-96a85bd3a5eb",
+      "name": "Telegram1",
+      "webhookId": "4ae4c886-49ee-4278-91e1-1d7567c886af",
+      "credentials": {
+        "telegramApi": {
+          "id": "lmFPcWpcAnt1PznK",
+          "name": "papertest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97c17a30-6f92-41b2-bb56-67459802b3c0",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "15-Minute Analysis Complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1000,
+        -80
+      ],
+      "id": "b611341e-1a28-4b1f-9199-9c16910f3d48",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=📊 *Trade Summary from {{ $json.EntryTime }}*:\n\n🪙 *Token:* {{ $json.Token }}\n📈 *Direction:* {{ $json.Direction }}\n💰 *Entry Price:* ${{ $json.EntryPrice }}\n\n📉 *Close Price:* ${{ $json.ClosePrice }}\n⏱ *Close Time (WAT):* {{ $json.CloseTime }}\n🚦 *Status:* {{ $json.Status }}\n\n📊 *PnL:* {{ $json.PnLPercentage }}%\n💵 *Gain/Loss:* ${{ $('Code1').item.json.CurrentAmountUSD }}\n📉 *Max Drawdown:* {{ $json.MaxDrawdown }}%\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        120
+      ],
+      "id": "99c9a9fe-2047-4557-b111-d3e8dfbdaaad",
+      "name": "Telegram2",
+      "webhookId": "4ae4c886-49ee-4278-91e1-1d7567c886af",
+      "credentials": {
+        "telegramApi": {
+          "id": "lmFPcWpcAnt1PznK",
+          "name": "papertest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97c17a30-6f92-41b2-bb56-67459802b3c0",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "15-Minute Analysis Complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "368c961e-f82f-4ba0-afe2-98a4a99bd523",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1660,
+        -480
+      ],
+      "id": "f83eec68-d743-43c6-8fb5-edb6bc89fcc5",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DS1mAwLpUHpMFEA-XGCJtyqblf9UYULYx8GAJ16SNXo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 884553038,
+          "mode": "list",
+          "cachedResultName": "Papertrading Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DS1mAwLpUHpMFEA-XGCJtyqblf9UYULYx8GAJ16SNXo/edit#gid=884553038"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "EntryTime"
+          ],
+          "schema": [
+            {
+              "id": "EntryTime",
+              "displayName": "EntryTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Token",
+              "displayName": "Token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Direction",
+              "displayName": "Direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "EntryPrice",
+              "displayName": "EntryPrice",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ClosePrice",
+              "displayName": "ClosePrice",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CloseTime",
+              "displayName": "CloseTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PnLPercentage",
+              "displayName": "PnLPercentage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "GainUSD",
+              "displayName": "GainUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CurrentAmountUSD",
+              "displayName": "CurrentAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MaxDrawdown",
+              "displayName": "MaxDrawdown",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1880,
+        -680
+      ],
+      "id": "79140f59-175f-4e97-bf9a-8953e16138d6",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7ykd3lpHqKY1IWYj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=📊 *Trade Summary from {{ $json.EntryTime }}*:\n\n🪙 *Token:* {{ $json.Token }}\n📈 *Direction:* {{ $json.Direction }}\n💰 *Entry Price:* ${{ $json.EntryPrice }}\n\n📉 *Close Price:* ${{ $json.ClosePrice }}\n⏱ *Close Time (WAT):* {{ $json.CloseTime }}\n🚦 *Status:* {{ $json.Status }}\n\n📊 *PnL:* {{ $json.PnLPercentage }}%\n💵 *Gain/Loss:* ${{ $('Code2').item.json.CurrentAmountUSD }}\n📉 *Max Drawdown:* {{ $json.MaxDrawdown }}%\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        -280
+      ],
+      "id": "671ea7b0-fbb0-4804-8983-fe4fd51f87c2",
+      "name": "Telegram3",
+      "webhookId": "4ae4c886-49ee-4278-91e1-1d7567c886af",
+      "credentials": {
+        "telegramApi": {
+          "id": "lmFPcWpcAnt1PznK",
+          "name": "papertest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97c17a30-6f92-41b2-bb56-67459802b3c0",
+              "leftValue": "={{ $json.result.list }}",
+              "rightValue": "15-Minute Analysis Complete",
+              "operator": {
+                "type": "array",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1000,
+        -580
+      ],
+      "id": "42d1b5e4-38d7-438f-a98d-4690b76faf51",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=**No result**\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        -680
+      ],
+      "id": "63477d5d-0b34-4971-957f-d5a81a718800",
+      "name": "Telegram4",
+      "webhookId": "4ae4c886-49ee-4278-91e1-1d7567c886af",
+      "credentials": {
+        "telegramApi": {
+          "id": "lmFPcWpcAnt1PznK",
+          "name": "papertest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DS1mAwLpUHpMFEA-XGCJtyqblf9UYULYx8GAJ16SNXo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 884553038,
+          "mode": "list",
+          "cachedResultName": "Papertrading Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DS1mAwLpUHpMFEA-XGCJtyqblf9UYULYx8GAJ16SNXo/edit#gid=884553038"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "EntryTime"
+          ],
+          "schema": [
+            {
+              "id": "EntryTime",
+              "displayName": "EntryTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Token",
+              "displayName": "Token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Direction",
+              "displayName": "Direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "EntryPrice",
+              "displayName": "EntryPrice",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ClosePrice",
+              "displayName": "ClosePrice",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CloseTime",
+              "displayName": "CloseTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PnLPercentage",
+              "displayName": "PnLPercentage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "GainUSD",
+              "displayName": "GainUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CurrentAmountUSD",
+              "displayName": "CurrentAmountUSD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MaxDrawdown",
+              "displayName": "MaxDrawdown",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1220,
+        -80
+      ],
+      "id": "c1524d98-9a49-430c-9f8e-ad05a28b2bda",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7ykd3lpHqKY1IWYj",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "1m chart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1m chart": {
+      "main": [
+        [
+          {
+            "node": "1m Candle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1m Candle": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1m Candle1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        []
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Telegram4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "1m Candle1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "28997bcd-321f-4056-ba0a-2a112c753cab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bd3fb2445c8d5240ef1fe92cf193d7e05c0fe42313f2bfa7af5644dbeaa225be"
+  },
+  "id": "WhHi4Gzd72vPFhhO",
+  "tags": []
+}

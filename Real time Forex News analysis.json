@@ -1,0 +1,674 @@
+{
+  "name": "ForexTech",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const inputText = $json[\"message\"][\"text\"]\nif (typeof inputText !== 'string') {\n  throw new Error('Input Text must be a string');\n}\n\nconst trimmedUpperText = inputText.trim().toUpperCase();\n//const tradingPairSymbol = `${trimmedUpperText}USDT`;\n\nreturn[\n  {json: {tradingPairSymbol: trimmedUpperText}}\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        580
+      ],
+      "id": "6fe8bc93-e5e2-46ce-8b8b-f2471ab955da",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -40,
+        660
+      ],
+      "id": "1527218c-acac-456c-b2e5-543e76eea543",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate sentiment analyzer, specializing in forex and macroeconomic markets. Analyze provided text and determine the market sentiment at the time for{{ $('Code').first().json.tradingPairSymbol }}, using a two-way approach:\n\nShort-term sentiment:\nEvaluate the immediate market reaction, recent news impact, and technical volatility.\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\nProvide a concise rationale explaining the short-term sentiment (include relevant headlines, affected currencies like {{ $('Code').first().json.tradingPairSymbol }}, and market-moving economic indicators).\n\nLong-term sentiment:\nEvaluate the overall market outlook, fundamentals, and long-term macroeconomic or policy trends (e.g., interest rate trajectories, inflation, geopolitical risk).\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\nProvide a concise rationale explaining the long-term sentiment (include major central bank decisions, global economic shifts, or political developments).\n\nYour Output must be exactly in a JSON Object with exactly two keys: \"shortTermSentiment\" and \"longTermSentiment\".\nThe value of each key must be an object with the keys: 'category', 'score', and 'rationale'.\nDo not output additional text.\n\nFor example, your output should look like:\n{\n  \"shortTermSentiment\": {\n    \"category\": \"Positive\",\n    \"score\": \"0.7\",\n    \"rationale\": \"....\"\n  },\n  \"longTermSentiment\": {\n    \"category\": \"Neutral\",\n    \"score\": \"0.0\",\n    \"rationale\": \"....\"\n  }\n}\n\nNow analyze the following text and provide your JSON output:\n{{ JSON.stringify($json.allPosts) }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        400,
+        960
+      ],
+      "id": "32979d7e-9478-4c5d-8b22-c7af4620a7c2",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allCandles = [];\nfor (const item of items){\n  allCandles.push(item.json);\n}\nreturn [{json: {allCandles}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        660
+      ],
+      "id": "5e7fcec0-2140-49c9-8c67-ade6e7fb729e",
+      "name": "Combine JSON"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        776,
+        810
+      ],
+      "id": "1575cee2-a98f-4145-a1cc-dde9b444c017",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        488,
+        1180
+      ],
+      "id": "67f46b1d-6dee-4f63-bab4-5c2a5a1d3e34",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6ISNg0ICNveW0DRc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allCandles = [];\nlet contentData = null;\n\nfor (const item of items) {\n  // Collect candles if present\n  if (item.json.allCandles !== undefined) {\n    allCandles.push(...item.json.allCandles);\n  }\n\n  // Extract text content if present\n  if (item.json.text && typeof item.json.text === \"string\") {\n    contentData = item.json.text; // Store the text content\n  }\n}\n\nreturn [{\n  json: {\n    allCandles, // Consolidated candle data\n    content: contentData // Text content extracted\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        996,
+        810
+      ],
+      "id": "8cf125cf-6e13-4da5-935f-b25892f198c7",
+      "name": "combine"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent, accurate, and real-time **Forex Market Analyst**.\n\nYour task is to analyze live market data for {{ $('Code').first().json.tradingPairSymbol }}, using the market data provided below\n\n\n🕒 **Analysis Timestamp:**  \n{{ DateTime.now().setZone('Africa/Lagos').toFormat(\"MM/dd/yyyy 'at' hh:mma\") }}\n\n📊 **Market Data*\nTechnical: {{ JSON.stringify($json['allCandles']) }}  \n→ Live candlesticks by timeframe: \"15m\", \"1h\", \"1d\".  \n→ Format: [Open, High, Low, Close, Volume]\n\nSentiment: {{ JSON.stringify($json['content']) }}  \n→ Real-time forex news sentiment from past 7 days.\n\n🧠 **Instructions**\n\n1️⃣ Categorize Candles:\n- Short-Term: 15m\n- Medium-Term: 1h\n- Long-Term: 1d\n\n2️⃣ Perform Analysis\n\n**Short-Term (15m + 1d overlay):**  \n- Price: Use latest close from 15m data  \n- Signals: Local support/resistance, breakout zones, price reaction  \n- Indicators:  \n  • MACD (12,26,9): Intraday trend & crossover momentum  \n  • RSI (14): OB/OS levels and divergence  \n  • BB (20,2): Volatility shifts, squeeze plays  \n- Sentiment: News bias (hawkish/dovish), volume surges\n\n**Long-Term (1d + 1h overlay):**  \n- Structure: Trend direction (uptrend/downtrend), channel patterns  \n- Indicators:  \n  • MACD: Momentum strength, early reversals  \n  • RSI: Trend exhaustion or sustained strength  \n  • BB: Expansion (breakouts) vs contraction (consolidation)  \n- Sentiment: Central bank guidance, inflation expectations, macro risk events\n\n**Leverage (1h + 15m):**  \n- Price Action: Break/retest setups, reaction at key levels  \n- Indicators:  \n  • MACD, RSI, OBV, BB  \n- Sentiment & Macro: Align trades with major economic reports or geopolitical shifts (e.g., NFP, CPI, rate decisions)\n\n🎯 **Risk/Reward Rule:**  \nUse the latest price. Maintain a minimum 1:3 RRR.  \nExample: If SL = 1%, TP = 3%. Base SL/TP on recent volatility and key zones.\n\n✅ **Output Format (return only this)**\n\n**{{ $('Code').first().json.tradingPairSymbol }}Analysis on {{ DateTime.now().setZone('Africa/Lagos').toFormat(\"MM/dd/yyyy 'at' hh:mma\") }}**\n\n**💼 Trading Recommendations**\n\n**📌 Spot Trading**\n\n**Short-Term Recommendation:**  \n• Action: Buy / Sell / Hold  \n• Entry Price:  \n• Stop-Loss:  \n• Take Profit:  \n• Rationale: Use intraday zones, MACD (12,26,9), RSI (14), BB (20,2), and sentiment cues.\n\n**Long-Term Recommendation:**  \n• Action: Buy / Sell / Hold  \n• Entry Price:  \n• Stop-Loss:  \n• Take Profit:  \n• Rationale: Use market structure, MACD/RSI/BB, and sentiment from macro news or central bank outlooks.\n\n**⚡ Leverage Trading**  \n• Position: Long / Short  \n• Recommended Leverage: (3x, 5x, etc.)  \n• Entry Price:  \n• Stop-Loss:  \n• Take Profit:  \n• Rationale: Combine breakouts/retests with indicator confirmation and macro sentiment for precision entries.\n\n---\n\nLet me know if you want a version tailored for a specific forex pair (like EUR/USD) or style (e.g., scalping vs swing).",
+        "options": {
+          "systemMessage": "=You are a highly intelligent, detail-oriented and accurate Forex Market Analyst."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1216,
+        810
+      ],
+      "id": "a8fde234-ce8f-4868-89cd-969852442e09",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1592,
+        810
+      ],
+      "id": "d9c74b81-f96d-4ae5-8746-4c6e98928cf6",
+      "name": "Telegram",
+      "webhookId": "2df5a126-1418-4e39-93bb-3491922d28bc",
+      "credentials": {
+        "telegramApi": {
+          "id": "S3bdTwIZwu7fvCNj",
+          "name": "Munex"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.twelvedata.com/time_series?symbol={{ $json.tradingPairSymbol }}&interval=15min&apikey=4a484ef9b9b44f04bbdbcae0e255b401",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        460
+      ],
+      "id": "b082e76f-63a2-4cd7-abdb-7c66ccdbeeff",
+      "name": "15m chart"
+    },
+    {
+      "parameters": {
+        "url": "https://api.twelvedata.com/time_series?symbol={{ $json.tradingPairSymbol }}&interval=1h&apikey=4a484ef9b9b44f04bbdbcae0e255b401",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        660
+      ],
+      "id": "a12a014f-2fa0-413e-808a-9ed4734fb559",
+      "name": "1hr chart"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.twelvedata.com/time_series?symbol={{ $json.tradingPairSymbol }}&interval=1day&apikey=4a484ef9b9b44f04bbdbcae0e255b401",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        860
+      ],
+      "id": "cfc28006-3629-4674-8f66-4a06c84a0a59",
+      "name": "1d chart"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"timeframe\": \"15m\",\n  \"candles\": {{$json}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        460
+      ],
+      "id": "5ec7c711-facb-4913-a257-f123816b470d",
+      "name": "15m Candle2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"timeframe\": \"1h\",\n  \"candles\": {{$json}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        660
+      ],
+      "id": "c8bd6348-24cb-4988-b3f8-6e602b43169b",
+      "name": "1h Candle1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"timeframe\": \"1d\",\n  \"candles\": {{$json}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        860
+      ],
+      "id": "64b2f034-42d7-4b8a-9ef1-ce6a5432c542",
+      "name": "1d Candle"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.twelvedata.com/price?symbol={{ $json.tradingPairSymbol }}&apikey=4a484ef9b9b44f04bbdbcae0e255b401\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        260
+      ],
+      "id": "5e31a82a-f99b-495c-b25c-c60823799241",
+      "name": "current price"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        260
+      ],
+      "id": "ccd70da0-9e86-4421-b37a-bf0dd80ec5ae",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1304,
+        1030
+      ],
+      "id": "0659b903-e72a-400f-afe8-fee7ae540a96",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6ISNg0ICNveW0DRc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -260,
+        1160
+      ],
+      "id": "75d97a30-e230-4607-8b15-3a07e4a3b1ec",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url}}",
+        "options": {
+          "ignoreSSL": false
+        }
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -40,
+        1160
+      ],
+      "id": "fda810a9-1aa5-437c-b843-abf1b4f8dc3c",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "operation": "clearDeduplicationHistory",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        960
+      ],
+      "id": "06fae35e-bdd5-4a39-a718-76f481deee93",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { url: 'https://www.forexlive.com/feed/news/' } },\n  \n  { json: { url: 'https://www.fxstreet.com/rss/news' } },\n  { json: { url: 'https://www.investing.com/rss/news_285.rss' } },\n   { json: { url: 'https://www.actionforex.com/feed' } },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        1160
+      ],
+      "id": "8c6f9ac2-7f12-43d7-83a9-f8f682100bb1",
+      "name": "url database"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Assume RSS items are in items[0].json.items or similar\nconst latest = items[0].json || items; // adjust this depending on your RSS parser structure\n\n\nreturn [\n  {\n    json: {\n\n      title: latest.title,\n      content: latest.contentSnippet,\n      link: latest.link,\n      guid: latest.guid,\n      source: $json.source || $json.url || 'Unknown Feed'\n    }\n  }\n];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        1285
+      ],
+      "id": "addeeaa0-c81f-48d6-b505-b35f26dcef57",
+      "name": "Extract1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const combined = items.map(item => item.json['content'])\n\nreturn [\n  {\n    json: {\n      allPosts: combined\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        960
+      ],
+      "id": "e1c40871-58b5-4b50-a068-fb180d44c6e1",
+      "name": "Clean"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -920,
+        585
+      ],
+      "id": "46d48344-ceeb-4bf8-a0a4-5339dc571527",
+      "name": "Telegram Trigger",
+      "webhookId": "aca17d08-0928-430c-a640-545d6d6dddba",
+      "credentials": {
+        "telegramApi": {
+          "id": "S3bdTwIZwu7fvCNj",
+          "name": "Munex"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Combine JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Combine JSON": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "combine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "15m chart",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "1hr chart",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "1d chart",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "url database",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "current price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "combine": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "15m chart": {
+      "main": [
+        [
+          {
+            "node": "15m Candle2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1hr chart": {
+      "main": [
+        [
+          {
+            "node": "1h Candle1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1d chart": {
+      "main": [
+        [
+          {
+            "node": "1d Candle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "15m Candle2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1h Candle1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "1d Candle": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "current price": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Extract1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Clean",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "url database": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8a685882-0655-4675-b62d-1101f05d0277",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9d0cf35b634a2c2c616de21968ef1aadd98bc0b64471988db30f04c74d09e31d"
+  },
+  "id": "NpCMBU5MYAQAXr0F",
+  "tags": []
+}

@@ -1,0 +1,358 @@
+{
+  "name": "Trump's Truth [TEST]",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1124,
+        180
+      ],
+      "id": "fabcafd0-5af9-4b8a-89c0-b4121736b202",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "3d5338b8-1c8f-47ce-9914-c4d69a2ddbba",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "Okay, I understand. I will analyze Trump's Truth posts based on your criteria and provide the requested output format.",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1412,
+        -40
+      ],
+      "id": "d28ce449-09b3-449f-aa31-1d4d1621fe7a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1372033341439873175",
+          "mode": "list",
+          "cachedResultName": "trump",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1372033341439873175"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        60
+      ],
+      "id": "ada170e8-1f26-4e6e-a59e-23416505a352",
+      "name": "Discord",
+      "webhookId": "f72c73b8-5b4f-482e-8ee7-a82598d12d9c",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate Crypto Analyst. Analyze posts below from Trump's Truth account. Only analyze posts that explicitly mention specific crypto tokens or coins by name or ticker in a meaningful context.\n\nIgnore posts that are:\nPurely celebratory (e.g., “Bitcoin hit $100,000!”).\nGeneral sentiment or milestone announcements without projections or impacts on tokens.\n\nPost: {{ $json.text }}\n\nInstructions:\nDetermine Relevance:\nOnly proceed if the post contains explicit mentions of specific tokens/coins by name or ticker (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL) and discusses projections, impacts, or meaningful context.\n\nIgnore posts that are about:\nGeneral crypto news.\nCelebrations or milestones (e.g., “Bitcoin hit $100,000!”).\nBroad sentiment or commentary without actionable or meaningful token impacts.\n\n***If no token or coin is clearly mentioned with meaningful context, output only: \"No_Impact\" and nothing else.****\n\nAnalyze Sentiment for Relevant Posts:\n\nIf the post is relevant:\nProvide a concise summary of the post’s impact on the mentioned token(s).\nList each token ticker explicitly mentioned.\nAssign sentiment: BULLISH for positive impacts or projections, BEARISH for negative impacts or concerns.\n\nOutput (in Plain Text Only), ***if the post is relevant***:\n**Trump's Truth [TEST]**\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nand nothing else.\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        1036,
+        -40
+      ],
+      "id": "2303e441-a751-493a-948b-11fe07ff301b",
+      "name": "Analyst"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        596,
+        -140
+      ],
+      "id": "a79b1ea4-3f95-4aaf-875a-30c2b0129b5c",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -240
+      ],
+      "id": "5cf7f57f-5b03-49aa-8a5f-68d37d2fb560",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        -140
+      ],
+      "id": "64fec58c-54ae-4921-99e8-f61d2691af7a",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "clearDeduplicationHistory",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -40
+      ],
+      "id": "3fb17797-e631-4f1c-acd2-c5675bc75869",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -140
+      ],
+      "id": "eb394d8d-cbc9-4d6b-b12d-7e3b56c7c313",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        308,
+        80
+      ],
+      "id": "2c366d10-242a-4b75-aedf-2c044efd9a1e",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a simulation engine for evaluating crypto sentiment detection from Trump’s Truth Social account.\n\nGenerate one realistic Truth Social post from Donald Trump that:\n\n✅ Meets all of the following:\n\nMentions one or more specific crypto tokens by name or ticker (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL)\n\nProvides meaningful context, projection, or market impact (not just hype or celebration)\n\n❌ Do not generate:\n\nGeneric celebration (e.g., “Bitcoin hit $100k!”)\n\nBroad crypto sentiment or motivational posts\n\n🎯 Use Trump's tone: bold, opinionated, patriotic, and occasionally sarcastic.\n\nFormat your output exactly like this:\n\n[Truth Social text]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        220,
+        -140
+      ],
+      "id": "52dafcf9-33ab-4060-8624-18d7f3ed8894",
+      "name": "Analyst1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Analyst1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c66439cb-5805-43b7-8b67-a77f74596f1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "188b3d8df24cf923b55902837cb9a3e2d37b8b11115f79508dca715e694442e9"
+  },
+  "id": "4l5MaRyyTfm83G7a",
+  "tags": []
+}

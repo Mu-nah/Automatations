@@ -1,0 +1,754 @@
+{
+  "name": "Trump Truth",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        964,
+        890
+      ],
+      "id": "29b49d6d-48d3-406a-a11c-5c94d9220990",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jUrQjuuBhxaWmnm7",
+          "name": "bull"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "3d5338b8-1c8f-47ce-9914-c4d69a2ddbba",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "Okay, I understand. I will analyze Trump's Truth posts based on your criteria and provide the requested output format.",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1252,
+        670
+      ],
+      "id": "06e430cd-6cf1-4df3-a37b-b0d55ec0544a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386801401912623104",
+          "mode": "list",
+          "cachedResultName": "python-everywhere",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386801401912623104"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        570
+      ],
+      "id": "dc40aae6-e4b3-4788-b75b-bc82935e3dfe",
+      "name": "Discord",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate Crypto Analyst.\n\nAnalyze the following posts from Trump’s Truth Social account.\n\n⚠️ If a post is missing or says \"undefined\", skip it entirely. Only analyze the post that contains actual content.\n\nPost 1: {{ $json.message }}\n\nPost 2: {{ $json.text }}\n\nInstructions:\n\n1. Determine Relevance:\n- Proceed only if the post contains **explicit mentions of specific tokens or coins by name or ticker** (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL) **AND** provides meaningful context such as projections, concerns, or macro/market impact.\n\n🚫 Ignore:\n- Celebratory posts (e.g., “Bitcoin hit $100,000!”)\n- Generic or vague sentiment\n- Posts with no coin/ticker mentioned\n\n2. Analyze Sentiment for Relevant Posts:\n- List each token/ticker explicitly mentioned\n- Label as **BULLISH** for positive outlooks, **BEARISH** for negative implications\n\n***If no token or coin is clearly mentioned with meaningful context, output only: \"No_Impact\" and nothing else.****\n\nOutput EXACTLY (in Plain Text Only) in this format, ***if the post 1 is relevant***:\n**Trump's Truth**\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nand nothing else.\n\nExample: \n\n**Trump's Truth**\n\nCoin: BTC\nSentiment: BULLISH\n\nCoin: XRP\nSentiment: BEARISH\n\nOutput EXACTLY (in Plain Text Only) in this format, ***if the post 2 is relevant***:\n**Trump's Truth**\n\nCoin: COIN_TICKER (add [TEST])\nSentiment: BULLISH/BEARISH\n\nCoin: COIN_TICKER (add [TEST])\nSentiment: BULLISH/BEARISH\n\nand nothing else.\n\nExample:\n\n**Trump's Truth**\n\nCoin: BTC [TEST]\nSentiment: BULLISH\n\nCoin: XRP [TEST]\nSentiment: BEARISH\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        876,
+        670
+      ],
+      "id": "1e1b077f-4ac3-4881-9619-dcdb61a54eda",
+      "name": "Analyst",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        280,
+        320
+      ],
+      "id": "e00c06b3-630e-4e20-b2bc-9d5edc3a60ee",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        578,
+        170
+      ],
+      "id": "f1dcc957-5161-4f52-8a96-c75751c6546a",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        370
+      ],
+      "id": "810da45a-b263-432d-9798-79f8c1cbebdc",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.latestId }}{{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        578,
+        570
+      ],
+      "id": "25028980-200c-4d95-8970-4b4037d7f8ea",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        588,
+        1090
+      ],
+      "id": "9cc6c6eb-12aa-4b67-b09b-6a8296a75b22",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jUrQjuuBhxaWmnm7",
+          "name": "bull"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a simulation engine for evaluating crypto sentiment detection from Trump’s Truth Social account.\n\nGenerate one realistic Truth Social post from Donald Trump that:\n\n✅ Meets all of the following:\n\nMentions one or more specific crypto tokens by name or ticker (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL)\n\nProvides meaningful context, projection, or market impact (not just hype or celebration)\n\n❌ Do not generate:\n\nGeneric celebration (e.g., “Bitcoin hit $100k!”)\n\nBroad crypto sentiment or motivational posts\n\n🎯 Use Trump's tone: bold, opinionated, patriotic, and occasionally sarcastic.\n\nFormat your output exactly like this:\n\n[Truth Social text] \n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        500,
+        870
+      ],
+      "id": "5a9e505b-3e91-4022-9f09-fca6786d514c",
+      "name": "Analyst2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        770
+      ],
+      "id": "5b102859-3a34-49f8-a620-0529c4e588e9",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1692,
+        970
+      ],
+      "id": "33ade9b3-1e9d-4576-8742-2eb2ad1f18ce",
+      "name": "Discord1",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "Alert from Trump's Truth",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1472,
+        970
+      ],
+      "id": "7cbdfe27-ef0b-4a67-b685-1345f67e84ab",
+      "name": "Gmail",
+      "webhookId": "c60cac30-886f-4878-b78c-012c26c290cb",
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1369163185726296105",
+          "mode": "list",
+          "cachedResultName": "live-x-agent-bybit",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1369163185726296105"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1692,
+        770
+      ],
+      "id": "a8494580-7af6-4926-a07e-193b3f165b69",
+      "name": "Discord3",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386801401912623104",
+          "mode": "list",
+          "cachedResultName": "python-everywhere",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386801401912623104"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1692,
+        570
+      ],
+      "id": "bdb1bcc3-7fd5-49f6-80a6-ce64b1a2d201",
+      "name": "Discord4",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.scrapecreators.com/v1/truthsocial/user/posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "handle",
+              "value": "xai711"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "Id6kqd3Ob0Vi1hD46bVFVbtHdCo2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        670
+      ],
+      "id": "ee7ffb19-16a6-4d1b-a22b-eb43e1da43ce",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the full response structure\nconst response = items[0].json;\n\n// If the response is an array (like your example), extract the first object\nconst data = Array.isArray(response) ? response[0] : response;\n\n// Access posts\nconst posts = data?.posts || [];\n\nif (!Array.isArray(posts) || posts.length === 0) {\n  return [{ json: { latestText: \"No posts available.\" } }];\n}\n\n// Sort by created_at descending\nposts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\n// Get the latest post\nconst latest = posts[0];\n\n// Return latest post info\nreturn [\n  {\n    json: {\n      text: latest.text,\n      latestUrl: latest.url,\n      latestId: latest.id,\n      createdAt: latest.created_at,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        670
+      ],
+      "id": "86df7dd0-ddde-4fbf-b689-355f1e9b74b6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        670
+      ],
+      "id": "1e1e013c-de53-4f43-9b4d-f48cb6f4f91d",
+      "name": "Schedule Trigger (manual Truth)",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 45
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        870
+      ],
+      "id": "10b59e13-70ec-49b4-a219-726b80a169f4",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "94a58564-557a-478a-9eb0-a478bbd330e8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        320
+      ],
+      "id": "d700ba3f-3a36-4c82-bfd5-87cc6b4415ee",
+      "name": "Webhook",
+      "webhookId": "94a58564-557a-478a-9eb0-a478bbd330e8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = items[0].json.body;\n\nreturn [\n  {\n    json: {\n      id: body.id?.trim(),\n      message: body.text,\n      time: body.time,\n      url: body.url\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        320
+      ],
+      "id": "fdc7304a-2f35-4d82-9057-4992a8be4fd9",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1372033341439873175",
+          "mode": "list",
+          "cachedResultName": "trump",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1372033341439873175"
+        },
+        "content": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        578,
+        370
+      ],
+      "id": "21ec5112-2133-4af7-91a9-3b25a9061074",
+      "name": "Discord2",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst2": {
+      "main": [
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Discord4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger (manual Truth)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Analyst2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ed2cf57-5672-48d5-a983-8152980c9455",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60e4c3ebc07d97eea2689111806d81539db513e9a3147922e6387b005ad296b5"
+  },
+  "id": "zb4ZP86bKBN0XyXZ",
+  "tags": []
+}

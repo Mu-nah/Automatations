@@ -1,0 +1,573 @@
+{
+  "name": "Artemis Multi chain Analysis 7D",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/receive-post",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        -60
+      ],
+      "id": "8a0248fe-ee02-4854-b678-60e6d00a07c7",
+      "name": "Webhook",
+      "webhookId": "8e888007-5977-47e4-9109-b0c341ecdbae"
+    },
+    {
+      "parameters": {
+        "jsCode": "const puppeteerData = items[0].json.body?.data || \"\";\n\n// Clean and split into lines\nconst lines = puppeteerData\n  .split(\"\\n\")\n  .map(line => line.trim())\n  .filter(line => line !== \"\" && line !== \"Filter\" && line !== \"CSV Download\");\n\n// Extract labels\nconst metricLabels = [\n  \"Name\", \"Daily Active Addresses\", \"7D Change (Addresses)\", \"Daily Transactions\", \"7D  Change (Transactions)\",\n  \"Stablecoin Mkt Cap ($M)\", \"7D  Change (Stablecoin Mkt Cap)\",\n  \"Stablecoin Transfer Volume ($M)\", \"7D Change (Stablecoin Transfer Volume)\",\n  \"TVL ($M)\", \"7D Change (TVL)\", \"DEX Volumes ($M)\", \"7D  Change (DEX Volumes)\",\n  \"Fees ($K)\", \"7D Change (Fees)\", \"Revenue ($K)\", \"7D Change (Revenue)\",\n  \"Price ($)\", \"7D Change (Price)\", \"Mkt Cap ($M)\", \"7D Change (Mkt Cap)\"\n];\n\n// Date (today)\nconst dateStr = new Date().toLocaleDateString(\"en-GB\", {\n  day: \"2-digit\", month: \"long\", year: \"numeric\"\n});\n\n// Step 1: Find where project names start\nconst startIndex = lines.findIndex(line => line === \"Algorand\");\n\n// Step 2: Dynamically collect project names until the line becomes a number or starts with a digit\nconst projectNames = [];\nfor (let i = startIndex; i < lines.length; i++) {\n  const line = lines[i];\n  if (/^[-\\d.]/.test(line) || line === \"--\") break;\n  projectNames.push(line);\n}\n\n// Step 3: Parse metric values\nconst rawData = lines.slice(startIndex + projectNames.length);\nconst rows = [];\n\nprojectNames.forEach((name, i) => {\n  const values = rawData.slice(i * 20, i * 20 + 20); // 20 metrics per project\n  const row = {\n    Week: \"\",\n    Date: dateStr,\n    Name: name,\n  };\n\n  for (let j = 0; j < 20; j++) {\n    row[metricLabels[j + 1]] = values[j] ?? \"--\";\n  }\n\n  rows.push({ json: row });\n});\n\nreturn rows;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -200
+      ],
+      "id": "b20d6e69-0788-4375-8d4c-12f0ed3a50bf",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        20
+      ],
+      "id": "ce67450d-e5ed-489f-97d4-6851aa45a14c",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RHJSLrDRmF5fpgBgBk2UjemBpZ-W0r8C0Sc28oNoygw",
+          "mode": "list",
+          "cachedResultName": "Artemis Multi-chain analysis ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RHJSLrDRmF5fpgBgBk2UjemBpZ-W0r8C0Sc28oNoygw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 428805678,
+          "mode": "list",
+          "cachedResultName": "Sheet12",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RHJSLrDRmF5fpgBgBk2UjemBpZ-W0r8C0Sc28oNoygw/edit#gid=428805678"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Week ",
+              "displayName": "Week ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Daily Active Addresses",
+              "displayName": "Daily Active Addresses",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (Addresses)",
+              "displayName": "7D Change (Addresses)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Daily Transactions",
+              "displayName": "Daily Transactions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (Transactions)",
+              "displayName": "7D  Change (Transactions)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stablecoin Mkt Cap ($M)",
+              "displayName": "Stablecoin Mkt Cap ($M)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (Stablecoin Mkt Cap)",
+              "displayName": "7D  Change (Stablecoin Mkt Cap)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Stablecoin Transfer Volume ($M)",
+              "displayName": "Stablecoin Transfer Volume ($M)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (Stablecoin Transfer Volume)",
+              "displayName": "7D Change (Stablecoin Transfer Volume)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TVL ($M)",
+              "displayName": "TVL ($M)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (TVL)",
+              "displayName": "7D  Change (TVL)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DEX Volumes ($M)",
+              "displayName": "DEX Volumes ($M)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (DEX Volumes)",
+              "displayName": "7D  Change (DEX Volumes)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fees ($K)",
+              "displayName": "Fees ($K)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (Fees)",
+              "displayName": "7D Change (Fees)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Revenue ($K)",
+              "displayName": "Revenue ($K)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (Revenue)",
+              "displayName": "7D  Change (Revenue)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Price ($)",
+              "displayName": "Price ($)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (Price)",
+              "displayName": "7D  Change (Price)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mkt Cap ($M)",
+              "displayName": "Mkt Cap ($M)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D  Change (Mkt Cap)",
+              "displayName": "7D  Change (Mkt Cap)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Average category growth ",
+              "displayName": "Average category growth ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of revenue",
+              "displayName": "Correlation of revenue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of DEX Volumes ",
+              "displayName": "Correlation of DEX Volumes ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of Daily Active adresses",
+              "displayName": "Correlation of Daily Active adresses",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of daily transactions ",
+              "displayName": "Correlation of daily transactions ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of stablecoin transfer volume ",
+              "displayName": "Correlation of stablecoin transfer volume ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of stablecoin market cap",
+              "displayName": "Correlation of stablecoin market cap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of TVL",
+              "displayName": "Correlation of TVL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correlation of Fees",
+              "displayName": "Correlation of Fees",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Week",
+              "displayName": "Week",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (TVL)",
+              "displayName": "7D Change (TVL)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (DEX Volumes)",
+              "displayName": "7D Change (DEX Volumes)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (Revenue)",
+              "displayName": "7D Change (Revenue)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (Price)",
+              "displayName": "7D Change (Price)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "7D Change (Mkt Cap)",
+              "displayName": "7D Change (Mkt Cap)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        140,
+        -200
+      ],
+      "id": "37331efa-b535-4b37-b693-9da7551e4928",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vn8k47zS6c8hCuKW",
+          "name": "Google Sheets account 11"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=From the following data, generate a concise report that summarizes key insights across chains. Highlight top-performing chains, chains with the most significant 3M changes in metrics like Daily Active Addresses, Transactions, TVL, DEX Volume, and Stablecoin Volume. Mention any noticeable trends or outliers. Provide the summary in bullet points and finish with a 2-3 sentence general conclusion.\n\n{{ $json[\"body\"][\"data\"] }}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        160,
+        20
+      ],
+      "id": "c5d41dee-4f69-4e2e-88dc-dd7e76b461fa",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        280,
+        220
+      ],
+      "id": "d8dad019-e4bf-4a31-b51c-02f9379277e1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "rsw5vPk3LCgT7CtN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "1-6lB5UZwBpNPC5itOz-XXSYBdsMaBlUM9AnTmzS7Q90",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{$json[\"response\"][\"text\"]}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        520,
+        20
+      ],
+      "id": "9fcbeedb-2fec-41a4-9b51-e60fe444929c",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "W0gdv1SSRF46iUeM",
+          "name": "Google Docs account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7e4e7b5d-d48f-4fcb-8fe6-050d9a4514d2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "64b55a3983171781a67024b1a5fa6a86b5f7f44ddec2637b06febfc84e5b739c"
+  },
+  "id": "o0lu2LOdWhEEzTa0",
+  "tags": []
+}

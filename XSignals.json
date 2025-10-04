@@ -1,0 +1,3510 @@
+{
+  "name": "XSignals",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0ea17124-44ab-4afa-9cbd-d4e15cc292b0",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "=Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -326,
+        -927.5
+      ],
+      "id": "a3188d44-76e5-46b6-b1bc-6762a41a0638",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Market Alert from Watcher.Guru",
+        "emailType": "text",
+        "message": "=👉 {{ $('Clean').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28,
+        -1100
+      ],
+      "id": "9267e302-cacc-48fb-85d8-b335bdc2ed56",
+      "name": "Gmail",
+      "webhookId": "c4259848-670e-4ef9-abbf-bea2a3f9d81b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=🚨 Market Alert from Watcher.Guru\n\n👉 {{ $('Clean').item.json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -28,
+        -1300
+      ],
+      "id": "838f4e14-2c73-4c08-bc82-3e8af89d9b6b",
+      "name": "Telegram",
+      "webhookId": "01cf616d-a89c-48a9-a173-97bdeaa2577c",
+      "credentials": {
+        "telegramApi": {
+          "id": "bJSQ4xaSUirbwjne",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386881516667142304",
+          "mode": "list",
+          "cachedResultName": "watcher_guru",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386881516667142304"
+        },
+        "content": "=🚨 Market Alert from Watcher.Guru\n\n👉 {{ $('Clean').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -28,
+        -700
+      ],
+      "id": "c50a03d2-b840-4292-9fc5-cd176b8317ee",
+      "name": "Discord",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -28,
+        -500
+      ],
+      "id": "865190a9-63f6-4d99-82f7-ed93403310f8",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2320,
+        2100
+      ],
+      "id": "e5bc0405-9311-4077-a939-be87e25388fd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.twitter.com/2/lists/1910104571533517226/tweets",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=max_results",
+              "value": "=5"
+            },
+            {
+              "name": "=tweet.fields",
+              "value": "=created_at,author_id,text"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer AAAAAAAAAAAAAAAAAAAAABT%2B0AEAAAAAYuxSxdg7VzfBcoX7USgjlkZAoh8%3Du0PhYgzdeABdIIv3mrBbBXPCAZrQQ62nMrtatLN12JHbyovr5L"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2022,
+        2100
+      ],
+      "id": "73b1ac4c-f199-42eb-a667-be132cb11df5",
+      "name": "tweets",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -316,
+        2020
+      ],
+      "id": "f5b13946-045b-4f96-b688-75a8c1e20308",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3AI3PQQJPrKK3Fr9",
+          "name": "Ant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -326,
+        1472.5
+      ],
+      "id": "163172dd-9500-4511-9d4e-041c16d6e37f",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1393028429615599718",
+          "mode": "list",
+          "cachedResultName": "truth-peckshield-top-twitter-tests",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1393028429615599718"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -28,
+        1900
+      ],
+      "id": "ff2d6777-60e3-4ac6-860b-510d713dcfc4",
+      "name": "Discord3",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -28,
+        1300
+      ],
+      "id": "ca0df7f6-be98-4ec8-8fc5-0001c66c9259",
+      "name": "No Operation, do nothing4"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.data.map(item => {\n  return { json: item };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1724,
+        2100
+      ],
+      "id": "4cb0c7a7-7d09-446e-886f-08b5893dcbec",
+      "name": "Code1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1387497871751196672",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5f565003-f8eb-4ecf-8470-68b6de253e1e",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1882495372389670912",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "775b6f58-beae-4d4f-bf7a-88a00d586690",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "WatcherGuru",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        -527.5
+      ],
+      "id": "f2e59780-660a-4767-bc4f-6e2f81ceb262",
+      "name": "Watcher.guru"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1504,
+        2250
+      ],
+      "id": "9dffb3ce-fe56-44f3-bfa2-5138a2e36942",
+      "name": "Loop Over Items",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "52a9e486-e6dc-43ea-bc8d-0320ea34f0dd",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "25073877",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "d0b4b2a3-fa1a-45ab-8a3f-02e3d14caf34",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "https://x.com/Fifteenmin_news/status/1941767896406901165",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "ce70b1a9-72be-4d07-9b34-dfafa09905c7",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "Trump",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        1872.5
+      ],
+      "id": "0e5e17db-3b98-42a0-b8c1-96ea24bf92e0",
+      "name": "Trump's X account"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        -477.5
+      ],
+      "id": "b9e3ce0a-9804-4a3f-9f5b-7c5b9cfffdaa",
+      "name": "No Operation, do nothing5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        2272.5
+      ],
+      "id": "e5bb135a-d714-4b34-948d-e83fa8f631c5",
+      "name": "No Operation, do nothing7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        -727.5
+      ],
+      "id": "3c768b26-0986-4044-acf5-be31171141c4",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -316,
+        -380
+      ],
+      "id": "53e0ae20-f986-4ddb-9fa8-e34d3a61f702",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gVwrZZ23S8RrKMI4",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text || tweet.tweet,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -844,
+        -727.5
+      ],
+      "id": "adc70d29-7e93-4108-bf36-28000dd56ccb",
+      "name": "Clean"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text || tweet.tweet,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -844,
+        1772.5
+      ],
+      "id": "470ea350-efed-4117-a1ff-e8061cbdb453",
+      "name": "Clean2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        1772.5
+      ],
+      "id": "ce37e1d8-3991-4125-8a5b-6829de5dada0",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Does the following post mention or strongly imply that $500 billion or more in money, liquidity, capital, funds, or investment is entering or leaving a financial market?\n\nOnly respond with:\n\n\"Yes\" \n\n\"No\" \n\nDo not explain. Do not summarize. Just return \"Yes\" or \"No\" and nothing else.\n\npost 1: {{ $('Clean').item.json.text }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -404,
+        -600
+      ],
+      "id": "5579d683-bdca-419e-9ceb-d1d1cf5ccdab",
+      "name": "Analyst"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate Crypto Analyst. Analyze posts below from Trump's Twitter account. Only analyze posts that explicitly mention specific crypto tokens or coins by name or ticker in a meaningful context.\n\nIgnore posts that are:\nPurely celebratory (e.g., “Bitcoin hit $100,000!”).\nGeneral sentiment or milestone announcements without projections or impacts on tokens.\n\nPost: {{ $json.text }}\n\nInstructions:\nDetermine Relevance:\nOnly proceed if the post contains explicit mentions of specific tokens/coins by name or ticker (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL) and discusses projections, impacts, or meaningful context.\n\nIgnore posts that are about:\nGeneral crypto news.\nCelebrations or milestones (e.g., “Bitcoin hit $100,000!”).\nBroad sentiment or commentary without actionable or meaningful token impacts.\n\n***If no token or coin is clearly mentioned with meaningful context, output only: \"No_Impact\" and nothing else.****\n\nAnalyze Sentiment for Relevant Posts:\n\nIf the post is relevant:\nProvide a concise summary of the post’s impact on the mentioned token(s).\nList each token ticker explicitly mentioned.\nAssign sentiment: BULLISH for positive impacts or projections, BEARISH for negative impacts or concerns.\n\nOutput (in Plain Text Only), ***if the post is relevant***:\n**Trump's Twitter**\n\nCoin: COIN_TICKER (add \"[TEST]\" only if the post has it)\nSentiment: BULLISH/BEARISH\n\nCoin: COIN_TICKER (add \"[TEST]\" only if the post has it)\nSentiment: BULLISH/BEARISH\n\nand nothing else.\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -404,
+        1800
+      ],
+      "id": "5863420c-c8b0-4a9f-891a-aaac3c079b03",
+      "name": "Analyst3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -326,
+        672.5
+      ],
+      "id": "9e1ea964-b8c5-4f71-a5bf-fffe74a9590e",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text || tweet.tweet,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -844,
+        972.5
+      ],
+      "id": "e95700ba-762c-42ed-a2e7-3786d7cbfc9e",
+      "name": "Clean "
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -316,
+        1220
+      ],
+      "id": "19136442-6e69-487f-a852-e2590303683f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jUrQjuuBhxaWmnm7",
+          "name": "bull"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1372546513267593286",
+          "mode": "list",
+          "cachedResultName": "dave_portnoy",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1372546513267593286"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -28,
+        1100
+      ],
+      "id": "8772db73-2bba-4cab-aeb8-a2ab73257381",
+      "name": "Discord4",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -28,
+        500
+      ],
+      "id": "c8522da8-3dc6-4b66-b227-481510d54a05",
+      "name": "No Operation, do nothing8"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        1172.5
+      ],
+      "id": "377b0069-84cf-46ec-8b3e-a443d7f68122",
+      "name": "No Operation, do nothing9"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        972.5
+      ],
+      "id": "daba0972-6456-4f70-8a05-7080027857ad",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and precise extractor for on-chain Contract Addresses (CA). Your task is to scan tweets from Dave Portnoy and extract *all* contract addresses mentioned.\n\n🔽 Input:\n{{ $json.text }}\n\n📌 Instructions:\n\nStep 1: Determine Relevance\nOnly analyze if the post contains at least one valid contract address. Supported formats include:\n✅ EVM: Must start with 0x\nMust be exactly 42 characters long\n(e.g., 0x32Be343B94f860124dC4fEe278FDCBD38C102D88)\n\n✅ Non-EVM (Solana, Sui, TON, etc.):\nAlphanumeric strings that are 32–64 characters\nMay end with suffixes like pump, coin, etc.\n(e.g., GoVbR7oN26iNy3uEqo6cBidebgyXGwrdoA7kBAaDpump)\n\n❌ Ignore:\nShortened URLs\nWallet names or nicknames\nToken names without a contract address\n\nIf it does not meet these conditions, return exactly: \"No_Impact\"  and nothing else.\n\nStep 2: If Relevant, Output Only This (Plain Text), and nothing else :\n**Dave Portnoy**\nContract Address: [Extracted CA address] (add \"[TEST]\" only if the post has it)\nSentiment: BULLISH\n\nContract Address: [Extracted CA address] (add \"[TEST]\" only if the post has it)\nSentiment: BULLISH\n\nContract Address: [Extracted CA address] (add \"[TEST]\" only if the post has it)\nSentiment: BULLISH"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -404,
+        1000
+      ],
+      "id": "d9ba3425-c399-4802-8e1e-5ba4f876b49c",
+      "name": "Analyst4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "43775786",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "75ca07e9-500c-4167-bf62-1a90bd0afffc",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1882495372389670912",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "876855ab-0117-418a-8fae-3aff517f6f42",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "DavePortnoy",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        1172.5
+      ],
+      "id": "aee5e586-66f0-4003-bc52-4cde13ef962c",
+      "name": "Dave Portnoy"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.id }} {{ $json.tweet }}",
+        "options": {
+          "historySize": "={{ 1e+50 }}"
+        }
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -1284,
+        2250
+      ],
+      "id": "08a73cb8-c266-4685-b51b-ed43471c49b7",
+      "name": "Remove Duplicates1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -316,
+        3592.5
+      ],
+      "id": "0bcbe193-cf6f-43f1-adc7-01ef11278d60",
+      "name": "Google Gemini Chat Model6",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jUrQjuuBhxaWmnm7",
+          "name": "bull"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -326,
+        3072.5
+      ],
+      "id": "86df8d16-eac1-478d-bc35-914444d0034a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1393028429615599718",
+          "mode": "list",
+          "cachedResultName": "truth-peckshield-top-twitter-tests",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1393028429615599718"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -28,
+        3300
+      ],
+      "id": "e7587855-6c44-4037-a74d-cb3c6c109d87",
+      "name": "Discord5",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -28,
+        2900
+      ],
+      "id": "61964a78-89d9-456d-9f01-72945d6194ae",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        3572.5
+      ],
+      "id": "11e23213-8bb6-4d4f-a246-8549ca845ef6",
+      "name": "No Operation, do nothing10"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text || tweet.tweet,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -844,
+        3372.5
+      ],
+      "id": "42042e42-ca96-4939-9dc4-dea9caa892b5",
+      "name": "Clean3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        3372.5
+      ],
+      "id": "cb7da0ed-923d-4b4e-b459-55f2b2521e59",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a precision crypto security filter.\n\nAnalyze the following tweet. Only proceed if the post **clearly reports an active, ongoing, or just-occurred hack, exploit, or protocol breach** involving a crypto token or project.\n\n📌 Trigger ONLY if:\n- The tweet announces or confirms a **live hack**, **fund drain**, or **critical exploit**\n- It involves smart contracts, bridges, DeFi protocols, exchanges, or wallets\n- A **specific token or project** is affected (e.g., GMX, SNX, BTC and so on)\n\n🚫 Ignore if:\n- It describes **post-mortem**, audit report, or retrospective analysis\n- It's about bug patches, fixes, bounties, or technical write-ups **after** the event\n- It discusses **market reaction**, token price, regulation, FUD, macro news, launches, or airdrops\n- No clearly identifiable token/project is being hacked or exploited\n\n### Post: {{ $json.text }}\n\n### Output Rules:\n- If valid (live exploit), return EXACTLY:\n**Top 200**  \nToken: [Token Ticker] (add \"[TEST]\" only if the Post has it)  \nSentiment: Bearish \nand nothing else\n\nNOTE: Always output the token ticker\n\nExample: \n**Top 200** \nToken: BTC [TEST] \nSentiment: Bearish \n\n**Top 200** \nToken: ETH\nSentiment: Bearish \n\n- If not valid, return EXACTLY:\n\"No_Impact\" and nothing else\n\nDo not include any explanation, summary, or extra text.\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -404,
+        3372.5
+      ],
+      "id": "2f456829-a400-4e5c-901b-fe82caba7d8a",
+      "name": "Analyst5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d0b4b2a3-fa1a-45ab-8a3f-02e3d14caf34",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1882495372389670912",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "64f10e53-d105-4512-b49b-2985c158c2aa",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1387497871751196672",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "561b86f5-11b1-4e96-9930-e87778cd59a9",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "43775786",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "f2602815-dcbb-4177-aee6-91247badaf25",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1422537905885442055",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "2958f324-faa2-4f31-bdaa-c264858ade02",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "877807935493033984",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "f92a4334-44cf-432b-b786-a85e055a7848",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "25073877",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        3522.5
+      ],
+      "id": "b5c131ac-f985-4833-bb12-e454dc945126",
+      "name": "Top 200 Projects"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -326,
+        -127.5
+      ],
+      "id": "95c7321e-4320-4035-8cbb-548f5a738692",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text || tweet.tweet,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -844,
+        172.5
+      ],
+      "id": "b9919814-0333-47d0-8da3-94deeac4d677",
+      "name": "Clean 1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1382354144693583972",
+          "mode": "list",
+          "cachedResultName": "crashius",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1382354144693583972"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -28,
+        100
+      ],
+      "id": "5a4727e0-ffd4-4382-bed5-458aa1032f85",
+      "name": "Discord6",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -28,
+        -300
+      ],
+      "id": "7eeb0d1a-b168-407b-8068-7f7fa3cd0bf2",
+      "name": "No Operation, do nothing11"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        172.5
+      ],
+      "id": "e9f925e4-d9d0-48d3-8af5-fb0e0046b10c",
+      "name": "Loop Over Items6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a precision filter for tweets from CrashiusClay. Only detect **confirmed, live token launches** — nothing else.\n\n🔍 Input: {{ $json.text }}\n\n\n📌 INSTRUCTIONS:\n\n✅ Proceed ONLY IF the tweet contains:\n- A **token name** (e.g. `$Brett`)\nAND\n- Launch confirmation language such as:\n  - “just launched”\n  - “now live”\n  - “live now”\n  - “chart just dropped”\n  - “chart is out”\n  - “buy now it’s live”\n  - “degen live”\n  - “first buyers”\n  - “token just dropped”\n  - “token is live now”\n  - “sniped early”\n  - “stealth launch”\n  - “airdrop just hit”\n  - “link to buy” or “here’s the CA”\n\n❌ Ignore if:\n- No mention of **launch**\n- Refers to **past performance**\n- Discusses **charts**, **market cap**, or **trades already done**\n- Includes motivational, meme, or general crypto commentary\n\n📤 OUTPUT EXACTLY IN THIS FORMAT:\nIf relevant:\n🚨 New Token Launched: $[TokenName] (add \"[TEST]\" only if the post has it)\n⚡️ Status: LIVE NOW \nand nothing else\n\nIf irrelevant:\n\"No_Impact\" \nand nothing else"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -404,
+        200
+      ],
+      "id": "8e6c4c9e-bfb1-413d-b36b-cc2c1a733e11",
+      "name": "Analyst6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1303447570203774980",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "75ca07e9-500c-4167-bf62-1a90bd0afffc",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1882495372389670912",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e99f5a27-132a-47f2-86cd-68d6689b0ced",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "CrashiusClay",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        372.5
+      ],
+      "id": "b9f598cd-3d8e-4fdb-9b27-97965ba117f3",
+      "name": "CrashiusClay"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        372.5
+      ],
+      "id": "83d33623-4d98-44f8-9348-9d714ec1c882",
+      "name": "No Operation, do nothing6"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -316,
+        420
+      ],
+      "id": "66a5e220-3759-4cfc-a63e-770fbbe2ad46",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gVwrZZ23S8RrKMI4",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Alert from Crashius Twitter",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28,
+        -100
+      ],
+      "id": "86d14cc5-5378-4917-9d47-dd8dde192c57",
+      "name": "Gmail1",
+      "webhookId": "d67745fe-a071-496c-b0c1-4032a0935046",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2320,
+        2400
+      ],
+      "id": "421f71f0-fbcd-4e2a-8986-e08c1347331b",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json.text;\n\nconst matches = input.match(/\\[(.*?) Tweet\\]\\n(.*?)(?=\\n\\[|$)/gs);\n\nconst output = matches.map(block => {\n  const [_, label, text] = block.match(/\\[(.*?) Tweet\\]\\n([\\s\\S]*)/);\n  return {\n    json: {\n      strategy: label.trim(),\n      tweet: text.trim()\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1724,
+        2400
+      ],
+      "id": "57a63992-ad4b-4579-8eff-eeaf1acc8a41",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a simulation engine for testing crypto alert strategies. Generate One realistic tweet for each of the six strategies below. Use natural language, realism, and formatting that mirrors real crypto Twitter behavior.\n\n🔔 1. Watcher.Guru Strategy  \nGenerate a tweet that mentions or strongly implies $500 billion or more in capital, liquidity, or investment entering or leaving a financial market in real time. The tweet **starts with \"JUST IN:\"** and **ends with \"[TEST]\"**.\n\n🔍 2. Dave Portnoy Strategy  \nGenerate a tweet from Dave Portnoy that includes at least **one valid on-chain contract address**, using one of these formats:  \n- EVM: starts with `0x`, 42 characters  \n- Solana/TON: 32–64 characters, alphanumeric, may end in `pump`, `coin`, etc.  \nEnd the tweet with **\"[TEST]\"**.\n\n🚀 3. Crashius Clay Strategy  \nGenerate a tweet that announces a **confirmed, live token launch** using phrases like:  \n“just launched”, “now live”, “chart is out”, “buy now it’s live”  \nMust include a token name (e.g., `$MOON`) and ends with **\"[TEST]\"**.\n\n🇺🇸 4. Trump X Strategy  \nGenerate a tweet from Donald Trump’s X account that:  \n- Explicitly mentions at least one crypto token (e.g., BTC, ETH, XRP, TRUMP)  \n- Includes a bullish or bearish market commentary or projection  \n- Ends with **\"[TEST]\"**\n\n📰 5. Crypto News Impact Strategy  \nGenerate a realistic crypto tweet that reports a **confirmed hack, exploit, or vulnerability** affecting a specific token, smart contract, DeFi protocol, or bridge.  \n- Describe a clear, specific security incident  \n- Mention the **exploit type**, **amount lost**, or **component affected** (bridge, vault, lending pool, etc.)  \n- Use real-sounding project names (e.g., Cetus, Aerodrome, Matrix, Optimism)  \n- Ends with **\"[TEST]\"**\n\n🛡 6. PeckShield Strategy  \nGenerate a tweet that looks like a **PeckShield Alert** about a confirmed exploit or suspicious transaction.  \n- It should include a shortened address (e.g., 0xAb...1234), and token/project name  \n- Include the action (e.g., exploited, rug pulled, drained, suspicious tx)  \n- Add a known loss amount (e.g., ~$2.5M) or key behavior (e.g., flashloan, swap, drain)  \n- Must **end with “[TEST]”**\n\n---\n\n🧾 Format your response exactly like this (plain text only and nothing else):\n\n[WatcherGuru Tweet]  \n[Tweet text]\n\n[DavePortnoy Tweet]  \n[Tweet text]\n\n[CrashiusClay Tweet]  \n[Tweet text]\n\n[Trump Tweet]  \n[Tweet text]\n\n[CryptoNews Tweet]  \n[Tweet text]\n\n[PeckShield Tweet]  \n[Tweet text]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -2100,
+        2400
+      ],
+      "id": "adef3e2c-fb86-4002-895a-250b1e27c872",
+      "name": "Analyst8"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2012,
+        2620
+      ],
+      "id": "38a7cfc1-4b02-4324-81d8-ca833d1fe9fe",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3AI3PQQJPrKK3Fr9",
+          "name": "Ant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f92a4334-44cf-432b-b786-a85e055a7848",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "CryptoNews",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        3122.5
+      ],
+      "id": "4773ca22-3936-40f5-b7cd-605bbde2afa2",
+      "name": "Top 200 Projects1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        3072.5
+      ],
+      "id": "1ed1eb18-ed1c-486f-8f30-bb7c6e3beed1",
+      "name": "No Operation, do nothing12"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -326,
+        2272.5
+      ],
+      "id": "e42529cf-3ad0-4fcf-9aa2-40902108b458",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1393028429615599718",
+          "mode": "list",
+          "cachedResultName": "truth-peckshield-top-twitter-tests",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1393028429615599718"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -28,
+        2700
+      ],
+      "id": "8e46e3c4-2def-4b12-81bf-a2d3378c63ea",
+      "name": "Discord7",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -844,
+        2872.5
+      ],
+      "id": "83f4e641-266f-4fff-b626-5d2867a6e408",
+      "name": "No Operation, do nothing13"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text || tweet.tweet,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -844,
+        2672.5
+      ],
+      "id": "ae45ab9a-a34f-462a-986d-9928713e09f3",
+      "name": "Clean4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        2672.5
+      ],
+      "id": "273b77ae-c524-4629-8c7d-899eb25781f1",
+      "name": "Loop Over Items7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a precision crypto security filter.\n\nAnalyze the following tweet. Only proceed if the post **clearly reports an active, ongoing, or just-occurred hack, exploit, or protocol breach** involving a crypto token or project.\n\n📌 Trigger ONLY if:\n- The tweet announces or confirms a **live hack**, **fund drain**, or **critical exploit**\n- It involves smart contracts, bridges, DeFi protocols, exchanges, or wallets\n- A **specific token or project** is affected (e.g., GMX, SNX, BTC and so on)\n\n🚫 Ignore if:\n- It describes **post-mortem**, audit report, or retrospective analysis\n- It's about bug patches, fixes, bounties, or technical write-ups **after** the event\n- It discusses **market reaction**, token price, regulation, FUD, macro news, launches, or airdrops\n- No clearly identifiable token/project is being hacked or exploited\n\n### Post: {{ $json.text }}\n\n### Output Rules:\n- If valid (live exploit), return EXACTLY:\n**Peckshield**  \nToken: [Ticker] (add \"[TEST]\" only if the post has it)  \nSentiment: Bearish \nand nothing else\n\nNOTE: Always output the token ticker\n\n**Peckshield**  \nToken: CETUS [TEST]\nSentiment: Bearish\n\nToken: SOL\nSentiment: Bearish\n\n- If not valid, return EXACTLY:\n\"No_Impact\" and nothing else\n\nDo not include any explanation, summary, or extra text.\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -404,
+        2600
+      ],
+      "id": "29bfa3bb-e6cd-4b84-aec9-b0f4e9d1e698",
+      "name": "Analyst7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d0b4b2a3-fa1a-45ab-8a3f-02e3d14caf34",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "950915985422221312",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "ce70b1a9-72be-4d07-9b34-dfafa09905c7",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "PeckShield",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "b71600e3-579c-42d6-a3f1-7566a3e6ef9d",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "=1882495372389670912",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1064,
+        2772.5
+      ],
+      "id": "1491798c-c9f9-4748-b299-ed810c0b7613",
+      "name": "Peckshield"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "=1387497871751196672",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "20c09c05-54c7-4512-98eb-6514bc00bd16"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Watcher.guru"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "301f73b2-58b5-4ad7-8b30-9c51d4c15515",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "=1875532595322130432",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Trump's Memecoin"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "92ae8bbf-1d20-47f6-8d8f-54e6f847a9a7",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "=1422537905885442055",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Coinbase"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "354bb71a-0e86-41fb-8637-5a910fdcd1c7",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "877807935493033984",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Binance"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a85c6daf-d1e3-4355-a9bd-9a3b5659a0f4",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "25073877",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Trump's X account"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e1e17332-fbcc-4ef4-b2a4-1dee470e36ec",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "1821257538760826880",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Me"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8bdd7832-8d18-4a62-9a4f-acffa8809e9c",
+                    "leftValue": "Xai Id",
+                    "rightValue": "1882495372389670912",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1c178fa2-dfee-405d-a63d-02cd632922ca",
+                    "leftValue": "davePortney",
+                    "rightValue": "43775786",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f1f317bb-3a60-4c71-929c-0ca0efb35eb2",
+                    "leftValue": "crashius",
+                    "rightValue": "1932790797260190158",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2320,
+        3960
+      ],
+      "id": "dbf34890-94fa-4c84-b526-5982eefb2313",
+      "name": "Switch1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -316,
+        2820
+      ],
+      "id": "ab5bca24-3d7f-4cd2-9761-0db76a7a7c67",
+      "name": "Google Gemini Chat Model7",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jUrQjuuBhxaWmnm7",
+          "name": "bull"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -28,
+        2100
+      ],
+      "id": "dccf017e-5cf1-4c58-8157-a75a8abe2f16",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6ea6be9-bb2f-4023-9d69-9077115f6df9",
+              "leftValue": "={{ $('Clean').item.json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28,
+        -900
+      ],
+      "id": "d3ece3f2-e545-4f30-85a5-89efbb22ca55",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "=🚨 Market Alert from Watcher.Guru\n\n👉 {{ $('Clean').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -300
+      ],
+      "id": "2c2317c0-755e-4fb9-983f-6889cbb19b75",
+      "name": "Discord1",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6ea6be9-bb2f-4023-9d69-9077115f6df9",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28,
+        300
+      ],
+      "id": "21e2e196-e043-4352-b132-3f5ed9c93044",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        500
+      ],
+      "id": "d6b7cc02-9705-437d-9271-bc6cee58e551",
+      "name": "Discord2",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6ea6be9-bb2f-4023-9d69-9077115f6df9",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28,
+        900
+      ],
+      "id": "d53ed06d-1f98-40d6-888a-c48b88ba4928",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        1100
+      ],
+      "id": "9c7f3a6f-b89c-4bb4-84ed-50ca6db7e92e",
+      "name": "Discord8",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6ea6be9-bb2f-4023-9d69-9077115f6df9",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28,
+        1700
+      ],
+      "id": "ffb52e06-9743-4cb5-8510-2aa9b42e4c09",
+      "name": "If9"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        2000
+      ],
+      "id": "c73a4486-9ddd-4da3-ba86-6780cec7d3d8",
+      "name": "Discord9",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6ea6be9-bb2f-4023-9d69-9077115f6df9",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28,
+        2500
+      ],
+      "id": "c6391fa8-7b43-46b8-ae49-a45fa67c79cc",
+      "name": "If10"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        2900
+      ],
+      "id": "cf80eec5-f507-4806-958a-b9009bd2ee47",
+      "name": "Discord10",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e6ea6be9-bb2f-4023-9d69-9077115f6df9",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28,
+        3500
+      ],
+      "id": "828b333c-90d2-41be-ae5f-fec5db933a73",
+      "name": "If11"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        3700
+      ],
+      "id": "71d88e04-6090-4649-96bd-9bf32d0316e0",
+      "name": "Discord11",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Alert from DavePortnoy",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28,
+        700
+      ],
+      "id": "8cf73d73-9c61-43b7-b33a-6a5ccd43ed65",
+      "name": "Gmail2",
+      "webhookId": "d67745fe-a071-496c-b0c1-4032a0935046",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Alert from Trump's Twitter",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28,
+        1500
+      ],
+      "id": "bf2b455b-a8c4-43b0-851e-1094d321dd32",
+      "name": "Gmail3",
+      "webhookId": "d67745fe-a071-496c-b0c1-4032a0935046",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Alert from Peckshield",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28,
+        2300
+      ],
+      "id": "2fcc17e2-45be-40cd-b824-aa931bfef8b1",
+      "name": "Gmail4",
+      "webhookId": "d67745fe-a071-496c-b0c1-4032a0935046",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Alert from Top 200 Projects",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28,
+        3100
+      ],
+      "id": "ed41bbb7-49fd-44f9-82d7-bdbeb0eb4a06",
+      "name": "Gmail5",
+      "webhookId": "d67745fe-a071-496c-b0c1-4032a0935046",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "fejirohanu@gmail.com",
+        "subject": "🚨 Market Alert from Watcher.Guru",
+        "emailType": "text",
+        "message": "=👉 {{ $('Clean').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        -900
+      ],
+      "id": "d5089cdf-92a0-4caa-874a-9bcd9e553e6c",
+      "name": "Gmail6",
+      "webhookId": "c4259848-670e-4ef9-abbf-bea2a3f9d81b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1369163185726296105",
+          "mode": "list",
+          "cachedResultName": "live-x-agent-bybit",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1369163185726296105"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        3500
+      ],
+      "id": "f00dccc6-feab-48ff-9e2c-4e2f449a89d1",
+      "name": "Discord12",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1369163185726296105",
+          "mode": "list",
+          "cachedResultName": "live-x-agent-bybit",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1369163185726296105"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        2500
+      ],
+      "id": "b961ca24-6102-4acb-8f46-f1322cf23178",
+      "name": "Discord13",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1369163185726296105",
+          "mode": "list",
+          "cachedResultName": "live-x-agent-bybit",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1369163185726296105"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        1700
+      ],
+      "id": "ead927eb-032d-40f4-bb21-32df4e16a4ad",
+      "name": "Discord14",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386801401912623104",
+          "mode": "list",
+          "cachedResultName": "python-everywhere",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386801401912623104"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        1300
+      ],
+      "id": "54b71bb1-79cd-453f-a780-5e4815528546",
+      "name": "Discord15",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386801401912623104",
+          "mode": "list",
+          "cachedResultName": "python-everywhere",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386801401912623104"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        2200
+      ],
+      "id": "fd633aef-48e2-472d-87b1-5063fa1597dd",
+      "name": "Discord16",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386801401912623104",
+          "mode": "list",
+          "cachedResultName": "python-everywhere",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386801401912623104"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        3100
+      ],
+      "id": "61cee2a0-381a-4f36-b593-1c211b29b4ae",
+      "name": "Discord17",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386801401912623104",
+          "mode": "list",
+          "cachedResultName": "python-everywhere",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386801401912623104"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -100
+      ],
+      "id": "c76c8c52-28d8-4548-b046-9d7037a24dbe",
+      "name": "Discord19",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -1100
+      ],
+      "id": "8ecbec16-1109-40b1-8e4a-3ef82eb2017c",
+      "name": "No Operation, do nothing3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        200,
+        800
+      ],
+      "id": "0912a400-e753-4947-bd89-aa7b8cecdd19",
+      "name": "No Operation, do nothing14"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "tweets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tweets": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Watcher.guru": {
+      "main": [
+        [
+          {
+            "node": "Clean",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trump's X account": {
+      "main": [
+        [
+          {
+            "node": "Clean2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean ": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dave Portnoy": {
+      "main": [
+        [
+          {
+            "node": "Clean ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Dave Portnoy",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trump's X account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Watcher.guru",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Top 200 Projects",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CrashiusClay",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Top 200 Projects1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Peckshield",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 200 Projects": {
+      "main": [
+        [
+          {
+            "node": "Clean3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing11",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean 1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items6": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrashiusClay": {
+      "main": [
+        [
+          {
+            "node": "Clean 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst6",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Analyst8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst8": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst8",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 200 Projects1": {
+      "main": [
+        [
+          {
+            "node": "Clean3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items7": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Peckshield": {
+      "main": [
+        [
+          {
+            "node": "Clean4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst7",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord": {
+      "main": [
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Discord19",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord6": {
+      "main": [
+        []
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing14",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord4": {
+      "main": [
+        []
+      ]
+    },
+    "If9": {
+      "main": [
+        [
+          {
+            "node": "Discord15",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord9",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord3": {
+      "main": [
+        []
+      ]
+    },
+    "If10": {
+      "main": [
+        [
+          {
+            "node": "Discord16",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord10",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord7": {
+      "main": [
+        []
+      ]
+    },
+    "If11": {
+      "main": [
+        [
+          {
+            "node": "Discord17",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord11",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord5": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a3404339-03fe-4d4c-9511-3fb08ef54b80",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60e4c3ebc07d97eea2689111806d81539db513e9a3147922e6387b005ad296b5"
+  },
+  "id": "leX7HSlCIiyszX3P",
+  "tags": []
+}

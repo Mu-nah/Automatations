@@ -1,0 +1,2195 @@
+{
+  "name": "XSignals(Test)",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0ea17124-44ab-4afa-9cbd-d4e15cc292b0",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "=Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -746,
+        330
+      ],
+      "id": "3b6e29cd-2e8a-4ecf-b50f-51a18253765d",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com, fejirohanu@gmail.com",
+        "subject": "🚨 Market Alert from Watcher.Guru",
+        "emailType": "text",
+        "message": "=👉 {{ $('Watcher.guru').item.json.tweet }} [TEST]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        380
+      ],
+      "id": "22ce116e-0551-4d97-a258-322f18184914",
+      "name": "Gmail",
+      "webhookId": "c4259848-670e-4ef9-abbf-bea2a3f9d81b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2uHjOLesJ6Kqa3lv",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=🚨 Market Alert from Watcher.Guru (TEST)\n\n👉 {{ $('Watcher.guru').item.json.tweet }} ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        180
+      ],
+      "id": "8737861f-fd4f-425c-8301-464b7324446f",
+      "name": "Telegram",
+      "webhookId": "01cf616d-a89c-48a9-a173-97bdeaa2577c",
+      "credentials": {
+        "telegramApi": {
+          "id": "nfaBK0TWFLISjIpT",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386881516667142304",
+          "mode": "list",
+          "cachedResultName": "watcher_guru",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386881516667142304"
+        },
+        "content": "=🚨 Market Alert from Watcher.Guru [TEST]\n\n👉 {{ $('Watcher.guru').item.json.tweet }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        580
+      ],
+      "id": "08e9e815-b742-431c-82d3-b227bdc290a4",
+      "name": "Discord",
+      "webhookId": "121b5958-895c-4322-860f-e0acdb32dc54",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        780
+      ],
+      "id": "38bcf026-5b72-4837-8d8d-76317e1a0c58",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2740,
+        2380
+      ],
+      "id": "0f8ce83a-1fb9-41d6-8556-d20edd0121a5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "=1387497871751196672",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "20c09c05-54c7-4512-98eb-6514bc00bd16"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Watcher.guru"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "301f73b2-58b5-4ad7-8b30-9c51d4c15515",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "=1875532595322130432",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Trump's Memecoin"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "92ae8bbf-1d20-47f6-8d8f-54e6f847a9a7",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "=1422537905885442055",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Coinbase"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "354bb71a-0e86-41fb-8637-5a910fdcd1c7",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "877807935493033984",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Binance"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a85c6daf-d1e3-4355-a9bd-9a3b5659a0f4",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "25073877",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Trump's X account"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e1e17332-fbcc-4ef4-b2a4-1dee470e36ec",
+                    "leftValue": "={{ $json.data[0].author_id }}",
+                    "rightValue": "1821257538760826880",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Me"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8bdd7832-8d18-4a62-9a4f-acffa8809e9c",
+                    "leftValue": "Xai Id",
+                    "rightValue": "1882495372389670912",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1c178fa2-dfee-405d-a63d-02cd632922ca",
+                    "leftValue": "davePortney",
+                    "rightValue": "43775786",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f1f317bb-3a60-4c71-929c-0ca0efb35eb2",
+                    "leftValue": "crashius",
+                    "rightValue": "1932790797260190158",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2740,
+        4140
+      ],
+      "id": "37545a0b-65ca-46f9-b3b9-959b845028f0",
+      "name": "Switch",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        2700
+      ],
+      "id": "2b65d2bc-5344-49c1-82a5-92e7f1441901",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "314041a8-7746-41ef-9e9b-d379b04993ab",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "no_impact",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -746,
+        2280
+      ],
+      "id": "821f0092-7717-432a-83eb-a77b68fe491b",
+      "name": "If2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        2480
+      ],
+      "id": "ccfd31b7-dc62-4936-aa0b-77f710a25188",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1360696019465146494",
+          "mode": "list",
+          "cachedResultName": "n8n_listen",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1360696019465146494"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        2080
+      ],
+      "id": "cc8f1667-198f-42f9-971d-1021c0d3b46b",
+      "name": "Discord2",
+      "webhookId": "b2741aee-1028-4799-9e05-3c55ee6a4323",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        3300
+      ],
+      "id": "e6e034e9-2b73-44dc-8c9e-5ea5d1860756",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -746,
+        2880
+      ],
+      "id": "d8b91a94-a05b-45a9-b9bf-6dd26eb9bcca",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1372033341439873175",
+          "mode": "list",
+          "cachedResultName": "trump",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1372033341439873175"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        3060
+      ],
+      "id": "4bb6b577-3c7d-4aa2-9bd3-0178664a95e5",
+      "name": "Discord3",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        2680
+      ],
+      "id": "c7826025-12ad-4574-a8b9-a08b1045548d",
+      "name": "No Operation, do nothing4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json.text;\n\nconst matches = input.match(/\\[(.*?) Tweet\\]\\n(.*?)(?=\\n\\[|$)/gs);\n\nconst output = matches.map(block => {\n  const [_, label, text] = block.match(/\\[(.*?) Tweet\\]\\n([\\s\\S]*)/);\n  return {\n    json: {\n      strategy: label.trim(),\n      tweet: text.trim()\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2140,
+        2380
+      ],
+      "id": "16a8b6fb-14e2-477a-9e61-50fd5338b5c1",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "WatcherGuru",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1484,
+        752.5
+      ],
+      "id": "fc830189-bea1-4988-88bd-1e965def7969",
+      "name": "Watcher.guru"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1422537905885442055",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "52a9e486-e6dc-43ea-bc8d-0320ea34f0dd",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "877807935493033984",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "d576a901-5fca-4faa-ae48-af376c39b8ad",
+              "leftValue": "={{ $json.author_id }}",
+              "rightValue": "1882495372389670912",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1480,
+        2560
+      ],
+      "id": "f4b2e6a6-eeca-4e7c-b9ad-fb9ed615f51d",
+      "name": "Coinbase/Binance"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1924,
+        2380
+      ],
+      "id": "0131f34c-0c31-4703-afe7-1f4232683fec",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "52a9e486-e6dc-43ea-bc8d-0320ea34f0dd",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "Trump",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1484,
+        3152.5
+      ],
+      "id": "957ddb41-9756-46af-b0b9-99e0c78c6ea8",
+      "name": "Trump's X account"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        2630
+      ],
+      "id": "b397be38-978d-4a34-979b-51af94c8222d",
+      "name": "No Operation, do nothing3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        830
+      ],
+      "id": "32dabdc5-b7e8-4cf0-83a2-2c2e35f580ef",
+      "name": "No Operation, do nothing5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        3230
+      ],
+      "id": "8a9cdc30-df1c-4cc4-b384-48bf322d376f",
+      "name": "No Operation, do nothing7"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1044,
+        552.5
+      ],
+      "id": "2a2db3da-24e7-43e7-be51-6faaefeda9e7",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        900
+      ],
+      "id": "c07d00fe-12a8-43f8-bc3e-3be3e5d13d37",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1260,
+        560
+      ],
+      "id": "90f73169-0f54-4388-82ac-11b0cf58a6c6",
+      "name": "Clean"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        2352.5
+      ],
+      "id": "27098c3b-5fcd-46c2-9277-bdda6a3b829f",
+      "name": "Clean1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1044,
+        2352.5
+      ],
+      "id": "0da0f96f-0fe9-4875-84e2-ecb73b8e2154",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        2952.5
+      ],
+      "id": "e85ef559-eb28-4cd3-b3d1-bc7e60787c90",
+      "name": "Clean2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1044,
+        2952.5
+      ],
+      "id": "d92b3e13-00d7-4cc7-b536-90e7b9be9932",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Does the following post mention or strongly imply that $500 billion or more in money, liquidity, capital, funds, or investment is entering or leaving a financial market?\n\nOnly respond with:\n\n\"Yes\" \n\n\"No\" \n\nDo not explain. Do not summarize. Just return \"Yes\" or \"No\" and nothing else.\n\npost: {{ $('Watcher.guru').item.json.tweet }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -820,
+        680
+      ],
+      "id": "3539f422-f46f-4ba6-a799-e3685f11a97b",
+      "name": "Analyst"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a crypto news analyst. Carefully read the content below and identify only tokens that Binance or Coinbase will:\n\nlist (contain phrase: \"will list\"), or\n\nadd to roadmap (contain phrase: \"assets added to the roadmap\").\n\nOnly output tokens that meet both of these conditions:\n\nThe source is Binance or Coinbase.\n\nThe text clearly states a token will be listed or added to the roadmap using the exact phrases:\n\n“will list”\n\n“assets added to the roadmap”\n\nIgnore everything else, including:\n\ntokens being supported, airdropped, staked\n\navailability in countries or wallets\n\nupgrades or features\n\nIf no valid token listing or roadmap addition is found, return exactly: \"no_impact\" and nothing else.\n\nTweets content: {{ $json.text }}\n\nIf it is about a listing; output, for each token mentioned, only the following in plain text (no formatting or markdown):\n\n**New Token Listing (X accounts)**\nOverview:  [Short summary of what the tweet says]\nToken: [Mentioned Token Ticker]\nSentiment: [Bullish or Bearish]\n\nand nothing else."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -824,
+        2480
+      ],
+      "id": "39febecd-fcee-4df1-9d57-997e428c9862",
+      "name": "Analyst2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate Crypto Analyst. Analyze posts below from Trump's Twitter account. Only analyze posts that explicitly mention specific crypto tokens or coins by name or ticker in a meaningful context.\n\nIgnore posts that are:\nPurely celebratory (e.g., “Bitcoin hit $100,000!”).\nGeneral sentiment or milestone announcements without projections or impacts on tokens.\n\nPost: {{ $('Trump\\'s X account').item.json.tweet }}\n\nInstructions:\nDetermine Relevance:\nOnly proceed if the post contains explicit mentions of specific tokens/coins by name or ticker (e.g., BTC, ETH, DOGE, TRUMP, XRP, SOL) and discusses projections, impacts, or meaningful context.\n\nIgnore posts that are about:\nGeneral crypto news.\nCelebrations or milestones (e.g., “Bitcoin hit $100,000!”).\nBroad sentiment or commentary without actionable or meaningful token impacts.\n\n***If no token or coin is clearly mentioned with meaningful context, output only: \"No_Impact\" and nothing else.****\n\nAnalyze Sentiment for Relevant Posts:\n\nIf the post is relevant:\nProvide a concise summary of the post’s impact on the mentioned token(s).\nList each token ticker explicitly mentioned.\nAssign sentiment: BULLISH for positive impacts or projections, BEARISH for negative impacts or concerns.\n\nOutput (in Plain Text Only), ***if the post is relevant***:\n**Trump's Twitter [TEST]**\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nCoin: COIN_TICKER\nSentiment: BULLISH/BEARISH\n\nand nothing else.\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -824,
+        3080
+      ],
+      "id": "4225f106-b711-410a-88fb-bf728814e7fe",
+      "name": "Analyst3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -740,
+        1680
+      ],
+      "id": "d521771a-d946-4336-9d0d-49917bae4700",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1260,
+        1760
+      ],
+      "id": "78d2c327-8814-4a3a-8032-e386611b5a27",
+      "name": "Clean "
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        2100
+      ],
+      "id": "d6c3cdc6-56cf-44a9-9836-a87eeb29f9e3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1372546513267593286",
+          "mode": "list",
+          "cachedResultName": "dave_portnoy",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1372546513267593286"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        1880
+      ],
+      "id": "f20e791c-b98e-4b11-9c2b-cd09a121a007",
+      "name": "Discord4",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        1580
+      ],
+      "id": "fab23f33-63fb-42d7-9605-067d59272b12",
+      "name": "No Operation, do nothing8"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        2030
+      ],
+      "id": "616a3fc4-7661-423e-a581-d0b89aabb0ef",
+      "name": "No Operation, do nothing9"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1044,
+        1752.5
+      ],
+      "id": "6a8070c7-4fa3-4320-ae92-7747fd33a64d",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and precise extractor for on-chain Contract Addresses (CA). Your task is to scan tweets from Dave Portnoy and extract *all* contract addresses mentioned.\n\n🔽 Input:\n{{ $('Dave Portnoy').item.json.tweet }}\n\n📌 Instructions:\n\nStep 1: Determine Relevance\nOnly analyze if the post contains at least one valid contract address. Supported formats include:\n✅ EVM: Must start with 0x\nMust be exactly 42 characters long\n(e.g., 0x32Be343B94f860124dC4fEe278FDCBD38C102D88)\n\n✅ Non-EVM (Solana, Sui, TON, etc.):\nAlphanumeric strings that are 32–64 characters\nMay end with suffixes like pump, coin, etc.\n(e.g., GoVbR7oN26iNy3uEqo6cBidebgyXGwrdoA7kBAaDpump)\n\n❌ Ignore:\nShortened URLs\nWallet names or nicknames\nToken names without a contract address\n\nIf it does not meet these conditions, return exactly: \"No_Impact\"  and nothing else.\n\nStep 2: If Relevant, Output Only This (Plain Text), and nothing else :\n**Dave Portnoy [TEST]**\nContract Address: [Extracted CA address]\nSentiment: BULLISH\n\nContract Address: [Extracted CA address]\nSentiment: BULLISH\n\nContract Address: [Extracted CA address]\nSentiment: BULLISH"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -824,
+        1880
+      ],
+      "id": "21a36bce-8a23-4880-a743-28da5c664770",
+      "name": "Analyst4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "DavePortnoy",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1484,
+        1952.5
+      ],
+      "id": "c4dd0b0d-5b18-4d60-8598-abb0ff07868c",
+      "name": "Dave Portnoy"
+    },
+    {
+      "parameters": {
+        "operation": "clearDeduplicationHistory",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -1704,
+        2380
+      ],
+      "id": "e90bcb23-0b0f-4b35-9d62-41b97e5e0dca",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        4000
+      ],
+      "id": "9795b9cc-e3c7-487c-b5c1-24a6ed775553",
+      "name": "Google Gemini Chat Model6",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "no_impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -740,
+        3480
+      ],
+      "id": "abcce906-dced-4a66-b3fb-7be68ea90871",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1386878311808110652",
+          "mode": "list",
+          "cachedResultName": "top_200_projects",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1386878311808110652"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        3580
+      ],
+      "id": "c2a0da65-be43-4634-b413-5267f222a59a",
+      "name": "Discord5",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        3280
+      ],
+      "id": "1c8b42d9-aea7-4268-8954-808acb302eaf",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        3752.5
+      ],
+      "id": "f206d371-ff52-428d-9a30-7c45e2f95979",
+      "name": "No Operation, do nothing10"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        3552.5
+      ],
+      "id": "7a6265d8-d1ef-4b59-87d2-d63b10f0ea21",
+      "name": "Clean3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1044,
+        3552.5
+      ],
+      "id": "aeca7713-07a5-4c08-8aad-8f1eafc6da51",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a crypto news analyst. Analyze the following tweet or RSS feed content below and determine whether it has significant impact on the crypto market. Use the criteria below to qualify high-impact news. If it does not meet any criteria or has no significant impact, ignore it completely, return \"no_impact\" and nothing else..\n\nTweets content:  {{ $('Top 200 Projects').item.json.tweet }}\n\n### Qualified News Criteria:\n📊 **Macroeconomic Data**: CPI, NFP, PPI, GDP, inflation, interest rate decisions (Fed, ECB).\n🏛 **Regulatory/Court Announcements**: SEC, CFTC rulings (e.g., Ripple victory, ETF approvals), tax policy changes.\n🌍 **Geopolitical Events**: National crypto bans/adoptions (e.g., U.S., El Salvador, China).\n🐋 **Whale/Institutional Activity**: Large on-chain transfers, ETF launches, custody infra developments.\n📈 **Market Sentiment Shifts**: FUD/FOMO, exchange hacks, inflow/outflow alerts, viral narratives.\n🔗 **DeFi/NFT/L2 News**: Protocol upgrades, Layer-2 adoptions (Arbitrum, Polygon), major partnerships.\n🧑‍⚖️ **Key Figure Events**: Founder arrests/releases (e.g., TON founder release, SBF conviction).\n💻 **Technological Upgrades**: Major protocol upgrades (Ethereum Merge, Solana scaling).\n⚠️ **Security Incidents**: Large-scale hacks (Ronin Bridge, Mt. Gox) or vulnerabilities.\n\nIf the news qualifies, output EXACTLY in the following format (plain text, not JSON):\n**Top 200 Project [TEST]**\n📰 Summary: [A short, clear summary of the news]\n📊 Sentiment: Positive / Neutral / Negative\n📉 Impact Level: From -1 (extremely negative) to 1 (extremely positive)\n 🪙 Affected Coins/Tokens: [BTC, ETH, SOL, etc.]\n💡 Reason for Impact: [Explain briefly which criteria was triggered and how it affects the market]\n\n🔁 Example Input: \"SEC officially approves Bitcoin Spot ETFs. Trading begins next week.\"\n**Top 200 Project [TEST]**\n✅ Output: 📰 Summary: The SEC has officially approved Bitcoin Spot ETFs, with trading set to begin next week.\n📊 Sentiment: Positive\n📉 Impact Level: 0.9\n🪙 Affected Coins/Tokens: BTC, ETH\n💡 Reason for Impact: Major regulatory decision by the SEC, increasing institutional access and liquidity for Bitcoin.\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -824,
+        3780
+      ],
+      "id": "11362310-865d-4662-860f-448d1291228b",
+      "name": "Analyst5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "52a9e486-e6dc-43ea-bc8d-0320ea34f0dd",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "CryptoNews",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1484,
+        3752.5
+      ],
+      "id": "610443d5-f875-4b74-bb88-c48085ea95bc",
+      "name": "Top 200 Projects"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cdb963bc-a9a1-41f7-b884-4734ab1d0624",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -746,
+        1080
+      ],
+      "id": "068edafe-19b5-407a-8a42-74861ecd7777",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.map(item => item.json)\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        1152.5
+      ],
+      "id": "14dd6a98-f295-4b76-956b-ee789b438122",
+      "name": "Clean 1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1382354144693583972",
+          "mode": "list",
+          "cachedResultName": "crashius",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1382354144693583972"
+        },
+        "content": "=**Crashius Clay Twitter (TEST) **\n{{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        1380
+      ],
+      "id": "10cc5ec0-fb29-4f2d-b736-3b9d9ffd0c8a",
+      "name": "Discord6",
+      "webhookId": "694bcc09-9e8f-4ef6-86be-7f5a0a1a7c99",
+      "credentials": {
+        "discordBotApi": {
+          "id": "Zc8KC2EMWTavCwIh",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        980
+      ],
+      "id": "3e84d797-c362-49e7-882d-766e4321684f",
+      "name": "No Operation, do nothing11"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1044,
+        1152.5
+      ],
+      "id": "e5ca09eb-17e6-46c5-aafb-b4208ace6d3f",
+      "name": "Loop Over Items6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a precision filter for tweets from CrashiusClay. Only detect **confirmed, live token launches** — nothing else.\n\n🔍 Input:{{ $('CrashiusClay').item.json.tweet }}\n\n\n📌 INSTRUCTIONS:\n\n✅ Proceed ONLY IF the tweet contains:\n- A **token name** (e.g. `$Brett`)\nAND\n- Launch confirmation language such as:\n  - “just launched”\n  - “now live”\n  - “live now”\n  - “chart just dropped”\n  - “chart is out”\n  - “buy now it’s live”\n  - “degen live”\n  - “first buyers”\n  - “token just dropped”\n  - “token is live now”\n  - “sniped early”\n  - “stealth launch”\n  - “airdrop just hit”\n  - “link to buy” or “here’s the CA”\n\n❌ Ignore if:\n- No mention of **launch**\n- Refers to **past performance**\n- Discusses **charts**, **market cap**, or **trades already done**\n- Includes motivational, meme, or general crypto commentary\n\n📤 OUTPUT EXACTLY IN THIS FORMAT:\nIf relevant:\n🚨 New Token Launched: $[TokenName]\n⚡️ Status: LIVE NOW \nand nothing else\n\nIf irrelevant:\n\"No_Impact\" \nand nothing else"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -820,
+        1280
+      ],
+      "id": "51b9de29-272f-4de4-8552-27c286577141",
+      "name": "Analyst6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "457ec7f3-cfac-4498-9be4-619202bac945",
+              "leftValue": "={{ $json.strategy }}",
+              "rightValue": "CrashiusClay",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1480,
+        1360
+      ],
+      "id": "5c8850ed-8b0f-42a5-90c2-a4b6debbc279",
+      "name": "CrashiusClay"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        1430
+      ],
+      "id": "b6a7f5c8-dc04-4ec4-a3c6-fc46410d24ed",
+      "name": "No Operation, do nothing6"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        1500
+      ],
+      "id": "f88b1c1b-126d-4353-8ab8-4f915771727b",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Twitter Alert from Crashius",
+        "message": "={{ $json.text }} [TEST]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        1180
+      ],
+      "id": "b8e06f9e-ff3a-463d-9fdf-878e17be7633",
+      "name": "Gmail1",
+      "webhookId": "d67745fe-a071-496c-b0c1-4032a0935046",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2uHjOLesJ6Kqa3lv",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a simulation engine for testing crypto alert strategies. Generate one realistic tweet for each of the five strategies below. Use natural language, realism, and formatting that mirrors real crypto Twitter behavior.\n\n🔔 1. Watcher.Guru Strategy\nGenerate a tweet that mentions or strongly implies $500 billion or more in capital, liquidity, or investment entering or leaving a financial market in real time. It's tweet starts with \"JUST IN:\"\n\n🔍 2. Dave Portnoy Strategy\nGenerate a tweet from Dave Portnoy that includes at least one valid on-chain contract address, using one of these formats:\n\nEVM (starts with 0x, 42 characters)\n\nSolana/TON (32–64 characters, alphanumeric, may end in pump, coin, etc.)\n\n🚀 3. Crashius Clay Strategy\nGenerate a tweet that announces a confirmed, live token launch using phrases like:\n“just launched”, “now live”, “chart is out”, “buy now it’s live”\nMust include a token name (e.g., $MOON).\n\n🇺🇸 4. Trump X Strategy\nGenerate a tweet from Donald Trump's X account that:\n\nExplicitly mentions at least one crypto token (e.g., BTC, ETH, XRP, TRUMP)\n\nIncludes a bullish or bearish market commentary or projection\n\n📰 5. Crypto News Impact Strategy\nSimulate a tweet or RSS-style news line that meets one of the Qualified News Criteria below:\n\nMacroeconomic data (e.g., CPI, interest rate decisions)\n\nSEC/CFTC rulings or ETF approvals\n\nMajor geopolitical moves (e.g., El Salvador adoption)\n\nWhale/institutional activity (e.g., custody infra, ETF launches)\n\nKey sentiment shifts (hacks, inflow alerts)\n\nLayer 2 upgrades, DeFi/NFT news, protocol launches\n\nHigh-profile arrests/releases or legal decisions\n\nSecurity incidents or large-scale hacks\n\nTechnological upgrades (Ethereum Merge, etc.)\n\nTweet must match one or more of these and imply significant market impact.\n\n🧾 Format your response exactly like this (plain text only and nothing else):\n\n[WatcherGuru Tweet]\n[Tweet text]\n\n[DavePortnoy Tweet]\n[Tweet text]\n\n[CrashiusClay Tweet]\n[Tweet text]\n\n[Trump Tweet]\n[Tweet text]\n\n[CryptoNews Tweet]\n[Tweet text]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -2520,
+        2380
+      ],
+      "id": "145eb080-f01d-4be2-8544-a9e5ea33a3df",
+      "name": "Analyst7"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2432,
+        2600
+      ],
+      "id": "bab828d8-ba9d-45f0-a94b-b40625225206",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bmxq5oKp0LkOB3xh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Analyst7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Discord2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Watcher.guru": {
+      "main": [
+        [
+          {
+            "node": "Clean",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coinbase/Binance": {
+      "main": [
+        [
+          {
+            "node": "Clean1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trump's X account": {
+      "main": [
+        [
+          {
+            "node": "Clean2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean ": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dave Portnoy": {
+      "main": [
+        [
+          {
+            "node": "Clean ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Dave Portnoy",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trump's X account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Coinbase/Binance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Watcher.guru",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Top 200 Projects",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CrashiusClay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 200 Projects": {
+      "main": [
+        [
+          {
+            "node": "Clean3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing11",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean 1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items6": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyst6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrashiusClay": {
+      "main": [
+        [
+          {
+            "node": "Clean 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst6",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst7",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst7": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2c69aa12-b9f9-4367-bd69-16b29152985e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "188b3d8df24cf923b55902837cb9a3e2d37b8b11115f79508dca715e694442e9"
+  },
+  "id": "HBpYx3yFE5lscV9p",
+  "tags": []
+}

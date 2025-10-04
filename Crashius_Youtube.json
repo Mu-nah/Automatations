@@ -1,0 +1,540 @@
+{
+  "name": "Crashius_Youtube",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst inputItems = $input.all();\n\n// Flatten and extract all items (assuming array of JSON objects)\nconst entries = inputItems.map(item => item.json);\n\n// Check if there are valid entries\nif (!entries || entries.length === 0) {\n  return [{ json: { error: 'No items found' } }];\n}\n\n// Sort by isoDate or pubDate descending\nentries.sort((a, b) => {\n  const dateA = new Date(a.isoDate || a.pubDate);\n  const dateB = new Date(b.isoDate || b.pubDate);\n  return dateB - dateA;\n});\n\n// Return only the latest one\nreturn [{ json: entries[0] }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        518,
+        410
+      ],
+      "id": "7c2b27bb-3156-4352-9c85-afee7209b4ea",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a precision filter for YouTube posts, designed to detect confirmed, live cryptocurrency token launches — and ignore everything else.\n\nAnalyze only one of these input at a time. Check for the Input that is undefined and skip it;\n\n🔍 Input 1: {{ $json.title }} \n\n🔍 Input 2: {{ $json.text }}\n\n📌 INSTRUCTIONS:\n✅ Proceed only if the post contains both\n\nA token name that includes a dollar sign prefix (e.g., $MOONSHOT, $Brett, and so on)\nAND\nConfirmed launch language, such as any of the following phrases:\n“just launched”\n“now live”\n“live now”\n“chart just dropped”\n“chart is out”\n“buy now it’s live”\n“degen live”\n“token just dropped”\n“token is live now”\n“stealth launch”\n“link to buy”\n“here’s the CA”\n\n❌ Output \"No_Impact\" and nothing else if:\nNo $TokenName is present\nThere's no clear indication the token just launched\nThe post discusses past market moves, market cap, charts, prices, strategy or general sentiment\nIt’s meme content, motivation, or hype without launch confirmation\n\n📤 OUTPUT :\nIf the post 1 confirms a new token launch, respond EXACTLY in this format:\n🚨 New Token Launched: $[TokenName] \n⚡️ Status: LIVE NOW \nand nothing else\n\nIf the post 2 confirms a new token launch, respond EXACTLY in this format:\n🚨 New Token Launched: $[TokenName] [TEST]\n⚡️ Status: LIVE NOW\nand nothing else.\n\nExample output; \n\n🚨 New Token Launched: $PENGU [TEST]\n⚡️ Status: LIVE NOW\n\n🚨 New Token Launched: $PUMP \n⚡️ Status: LIVE NOW\n\nIf not relevant, respond with:\nNo_Impact and nothing else\n\nBe thorough\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        1036,
+        560
+      ],
+      "id": "c8e0f833-68b5-4e93-823b-81c23d5c3e85",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1124,
+        780
+      ],
+      "id": "e000d673-02bb-4b71-8b7b-62773a7759b0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gVwrZZ23S8RrKMI4",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8e71fae1-358d-4c31-966b-f2fd95e54b8c",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_Impact",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1412,
+        560
+      ],
+      "id": "90f33c8c-4214-420b-bbcf-627b01ff3eb5",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        260
+      ],
+      "id": "f96f279a-4ee0-4973-841a-574a197991a3",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        816,
+        410
+      ],
+      "id": "689ae03e-e6c6-42bf-982d-28d81a0231c7",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1382354144693583972",
+          "mode": "list",
+          "cachedResultName": "crashius",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1382354144693583972"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        660
+      ],
+      "id": "519f45d5-fd8d-4af9-a50c-f6b370b83dc1",
+      "name": "Discord6",
+      "webhookId": "2692934d-596e-4337-9a78-8081ccd35bff",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "🚨 Twitter Alert from Crashius Youtube",
+        "message": "={{ $json.text }} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1632,
+        460
+      ],
+      "id": "cc22be11-f12b-4a61-9458-e258af4ed592",
+      "name": "Gmail1",
+      "webhookId": "d6c06741-029a-44e3-89d3-50448574d546",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.youtube.com/feeds/videos.xml?channel_id=UCtv4Gl8oD9GQiUuS3mO9g7g",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b4c00e8d-a3ba-4c96-9c53-8ae965172935",
+      "name": "RSS Read1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 25
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        710
+      ],
+      "id": "9b02e2eb-0b4e-4b7c-a8c2-437297598dac",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a simulation engine designed to generate YouTube video titles that test a token launch detection filter. Your goal is to create one realistic YouTube title that will be used to verify whether a post confirms a live crypto token launch.\n\n🔍 The title must contain both:\n\nA token name starting with $ (e.g., $MOONSHOT, $BRETT)\n\nAt least one launch confirmation phrase, such as:\n\n“just launched”\n\n“now live”\n\n“chart just dropped”\n\n“buy now it’s live”\n\n“token just dropped”\n\n“here’s the CA”\n\nUse informal, hype-style YouTube phrasing that mimics crypto influencers.\n\nFormat your output exactly like this:\n\n[video title text]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        440,
+        710
+      ],
+      "id": "66a80bf6-95c9-45ef-8ca4-d6c6004a8864",
+      "name": "Basic LLM Chain2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        930
+      ],
+      "id": "d6876c5e-6d3e-4abf-8752-4de9709e0a54",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3AI3PQQJPrKK3Fr9",
+          "name": "Ant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst inputItems = $input.all();\n\n// Flatten and extract all items (assuming array of JSON objects)\nconst entries = inputItems.map(item => item.json);\n\n// Check if there are valid entries\nif (!entries || entries.length === 0) {\n  return [{ json: { error: 'No items found' } }];\n}\n\n// Sort by isoDate or pubDate descending\nentries.sort((a, b) => {\n  const dateA = new Date(a.isoDate || a.pubDate);\n  const dateB = new Date(b.isoDate || b.pubDate);\n  return dateB - dateA;\n});\n\n// Return only the latest one\nreturn [{ json: entries[0] }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        710
+      ],
+      "id": "f5c44c3c-5e3a-47e8-91d7-9b81f415920a",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ3Hf4ArJKPQgPmSomyHATQ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        410
+      ],
+      "id": "92038b2d-0c6c-46b7-86f3-3c31737e7a3b",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        410
+      ],
+      "id": "f16f120b-8e10-4e5a-a45b-926e9021a73c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6dddcbc7-a194-48ca-8fb3-a830eb3f69f2",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "[TEST]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        860
+      ],
+      "id": "f2ce1bf9-c0e6-4ce2-9dea-a9e37b375881",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1852,
+        760
+      ],
+      "id": "95b29ab3-5586-44a6-85c2-cd758f88a0f5",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1391830495725359187",
+          "mode": "list",
+          "cachedResultName": "all-signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1391830495725359187"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1852,
+        960
+      ],
+      "id": "5cf6c280-ed22-4d12-bf93-88a974491ed6",
+      "name": "Discord",
+      "webhookId": "2692934d-596e-4337-9a78-8081ccd35bff",
+      "credentials": {
+        "discordBotApi": {
+          "id": "luP0R1CSYOPT3uvm",
+          "name": "Discord Bot account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord6": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c1692f75-bea3-467f-8121-bb2bf42d7821",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60e4c3ebc07d97eea2689111806d81539db513e9a3147922e6387b005ad296b5"
+  },
+  "id": "GuRXIqSWHEoZi4Fj",
+  "tags": []
+}

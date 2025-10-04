@@ -1,0 +1,205 @@
+{
+  "name": "Turo_test",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Turo and ChargePoint Notifications</title>\n  </head>\n  <body style=\"font-family: Arial, sans-serif; background: #ffffff; margin: 0; padding: 0; text-align: center;\">\n    \n    <!-- Turo Email -->\n    <div style=\"max-width: 480px; margin: 0 auto; padding: 40px 20px;\">\n      <h2 style=\"color: #000;\">Carlos M. has sent you a message</h2>\n      <p style=\"color: #666;\">Carlos has sent you a message about your Tesla Model X</p>\n\n      <img src=\"https://randomuser.me/api/portraits/men/38.jpg\" width=\"80\" height=\"80\" style=\"border-radius: 50%; margin-top: 20px;\" />\n      <p style=\"font-size: 16px; color: #000; margin: 15px 0;\">Hey! Looking forward to taking it on the highway!</p>\n\n      <a href=\"https://turo.com/reply-link\" style=\"background-color: #5f3dc4; color: white; text-decoration: none; padding: 12px 28px; border-radius: 6px; display: inline-block; font-weight: bold;\">Reply</a>\n\n      <hr style=\"margin: 40px 0; border: none; border-top: 1px solid #eee;\">\n\n      <h3 style=\"color: #000;\">Tesla Model X 2020</h3>\n      <img src=\"https://cdn.motor1.com/images/mgl/W4vKw/s1/2020-tesla-model-x.jpg\" width=\"100%\" style=\"max-width: 420px; border-radius: 8px;\" />\n\n      <div style=\"text-align: left; color: #000; font-size: 15px; margin-top: 20px;\">\n        <p><strong>Trip start:</strong> June 25, 2025 – 9:00 AM</p>\n        <p><strong>Trip end:</strong> June 25, 2025 – 6:00 PM</p>\n        <p><strong>Earnings:</strong> ₦200,000</p>\n        <p><strong>Distance included:</strong> Unlimited</p>\n      </div>\n\n      <a href=\"https://turo.com/trip-details\" style=\"margin-top: 25px; display: inline-block; background-color: #5f3dc4; color: white; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: bold;\">View trip details</a>\n\n      <p style=\"margin-top: 40px; color: #999; font-size: 14px;\">Powered by Turo</p>\n    </div>\n\n    <hr style=\"margin: 60px 0; border: none; border-top: 4px solid #eee;\">\n\n    <!-- ChargePoint Email -->\n    <div style=\"max-width: 480px; margin: 0 auto; padding: 40px 20px;\">\n      <h2 style=\"color: #000;\">ChargePoint: Please move your vehicle now</h2>\n\n      <p style=\"color: #333;\">Dear Hanu,</p>\n      <p style=\"color: #333; font-size: 16px; line-height: 1.5;\">\n        🚗⚡ Please move your vehicle now! A ₦10.00/Hr fee will apply if your vehicle isn’t unplugged within 2 hours because your EV is drawing very little power and may be fully charged.\n      </p>\n\n      <a href=\"https://chargepoint.com/move-vehicle\" style=\"background-color: #5f3dc4; color: white; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: bold; display: inline-block; margin-top: 20px;\">\n        Move Vehicle\n      </a>\n\n      <p style=\"margin-top: 40px; color: #999; font-size: 14px;\">Powered by ChargePoint</p>\n    </div>\n\n  </body>\n</html>\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        220,
+        0
+      ],
+      "id": "5535eb88-1965-4d98-b98f-9850ba09a321",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        220
+      ],
+      "id": "d6b43c08-c587-4d19-9313-167567bf5be7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3AI3PQQJPrKK3Fr9",
+          "name": "Ant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const htmlText = items[0].json.text || \"\";\n\n// Remove ```html and ``` markers\nconst cleanedHTML = htmlText.replace(/```html|```/g, \"\").trim();\n\n// --- CHARGEPOINT EXTRACTION ---\nconst cpSubjectMatch = cleanedHTML.match(/<h2[^>]*>(ChargePoint:[^<]*)<\\/h2>/i);\nconst cpMatch = cleanedHTML.match(/<p[^>]*>Dear\\s+(\\w+),<\\/p>\\s*<p[^>]*>([\\s\\S]*?)<\\/p>/i);\n\nconst cpSubject = cpSubjectMatch ? cpSubjectMatch[1].trim() : \"ChargePoint Alert\";\nconst cpBody = cpMatch\n  ? `Dear ${cpMatch[1]}, ${cpMatch[2].replace(/\\s+/g, ' ').trim()} [TEST]`\n  : \"No ChargePoint message found. [TEST]\";\n\n// --- TURO MOCK DATA ---\nconst senderFull = \"Carlos M.\";\nconst senderFirst = senderFull.split(\" \")[0];\nconst turoSubject = `${senderFirst} has sent you a message about your Tesla Model X`;\nconst turoBody = `${senderFull} has sent you a message [TEST]`;\n\n// --- RETURN BOTH ---\nreturn [\n  {\n    json: {\n      type: \"ChargePoint\",\n      subject: cpSubject,\n      body: cpBody\n    }\n  },\n  {\n    json: {\n      type: \"Turo\",\n      subject: turoSubject,\n      body: turoBody\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        0
+      ],
+      "id": "b8fc8d36-a7e6-4614-b940-b615680ea0d1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "39095ec9-8701-48aa-bbc4-40a697976d52",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        820,
+        0
+      ],
+      "id": "f2519a93-8c47-414d-b67e-f69b5c3731b7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "sendTo": "foundersoffice@secondmountainhq.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1020,
+        160
+      ],
+      "id": "500d2146-f46b-40e4-a859-59dbf2bf98da",
+      "name": "Gmail",
+      "webhookId": "ef55a89c-341e-445b-9f6d-c0cfaf364d1d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kNbQwRmYh87FXAyF",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -100
+      ],
+      "id": "930d9764-066c-48fc-ac89-c9d654723a24",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "09cddacc-8fab-4588-b22a-7433529d1f1b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60e4c3ebc07d97eea2689111806d81539db513e9a3147922e6387b005ad296b5"
+  },
+  "id": "Wvon2jz6h768H5Jc",
+  "tags": []
+}

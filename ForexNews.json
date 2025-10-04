@@ -1,0 +1,370 @@
+{
+  "name": "ForexNews",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://www.investing.com/rss/news_1.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        200
+      ],
+      "id": "1b49e929-67e5-4a0f-9ded-d200cd49979a",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        420
+      ],
+      "id": "490fa170-9ff5-43f7-a0e8-bab87420e55b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cMoc0ohI5JSWPwkl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional forex analyst.\nI will give you real-time economic or financial news.\n\nYour task:\n\nAnalyze the news and determine if it has enough market-moving power to cause significant movement on the 30-minute chart.\n\nOnly respond if the news could lead to a potential trade setup on any of the major forex pairs plus XAUUSD, BTCUSD.\n\nFor each affected pair:\n\nMention if it’s Bullish 🟢, Bearish 📉, or Neutral ⚪.\n\nGive a short, clear justification.\n\nEstimate how long the sentiment might last (e.g., \"Expected to last 2-4 hours\" or \"Likely to impact markets for the next 1-2 sessions\").\n\nAssign an Impact Level: High 🔥, Medium ⚡, Low 💧.\n\nIf the news is not strong or relevant enough, output only:\nNo signals\n\n📌 Criteria for Qualified News:\nMajor economic data (e.g., CPI, NFP, GDP).\nCentral bank decisions or commentary.\nMajor geopolitical events.\nBig institutional moves (e.g., ETF flows, government policies).\n\nIgnore: Small, irrelevant, or unrelated events.\n\nAlways aim for concise but highly accurate output.\n\n🧾 News Input: {{ $json.title }}\n\nOutput Format:\n\n📢 Market Call from Forex News 📢\n\n[PAIR]: [Sentiment] - [Justification].  \nImpact Level: [High 🔥 | Medium ⚡ | Low 💧].  \nExpected to last: [Time Range].\n\nIf the news is not significant:\n\nNo signals\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -820,
+        200
+      ],
+      "id": "bd3e2291-8f90-47f9-8b8d-cf2eb3063920",
+      "name": "Anaalyst"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ea6fbea3-4670-47e1-aaf1-fa38b90b7668",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No Signals",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        200
+      ],
+      "id": "d64ed19d-9f09-4b2b-b6ef-038ca5f7cb9f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "https://www.investing.com/rss/news_95.rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -220,
+        200
+      ],
+      "id": "a7fc48f5-d883-4020-9340-d922de74a6bc",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Prompt:\n\nYou are a financial analyst specializing in Forex markets.​\n\nAnalyze the following input:​\n\nForex News: {{ $json.pairs }}​\n\nMarket Sentiment Titles: {{ $json.titles }}​\n\nInstructions:\n\nEvaluate the Market Sentiment Titles and internally determine if the overall market sentiment is Positive, Negative, or Neutral. Do not output this step.​\n\nFor each Forex pair in the Forex News:​\n\nCompare the news sentiment for the pair with the overall market sentiment.​\n\nIf the news sentiment aligns with the overall market sentiment, output the signal in exactly this format:​\n\n***📢 Market Call from Forex News 📢***\n{line break}\n\n***[PAIR]***: [🟢 Bullish | 🔴 Bearish | 🟡 Neutral] — [Concise justification].\n***Expected to last [Time Range]:*** [timeframe to trade]\n***Impact Level***: [High 🔥 | Medium ⚡ | Low 💧].\n\nIf the news sentiment and market sentiment conflict, output nothing for that pair.​\n\nIf no pairs remain after filtering, output nothing.\n\nImportant:\n\nOutput only the signals, or nothing else.​\n\nDo not output any analysis, explanation, or extra text.​\n\nMaintain the exact output format, including emojis and spacing.​\n\nEnsure line breaks and formatting match the example exactly.​\n\nIf no pairs remain, outputn nothing.\n\n\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        660,
+        100
+      ],
+      "id": "656d4b23-c495-4fda-9b40-888897ec7c55",
+      "name": "Anaalyst1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        760,
+        320
+      ],
+      "id": "d4c0dec0-21a6-4f5f-b2ec-b22465a4a4fe",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cMoc0ohI5JSWPwkl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        220,
+        100
+      ],
+      "id": "484d083c-c9b3-4e40-87d0-8f75c433eebe",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 'items' is an array of all input items\nconst titles = items.map(item => item.json.title);\nreturn [{ titles }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "id": "4528ab70-64c8-444a-a6d6-e45de578250c",
+      "name": "Economic Indicator"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all incoming items (array of objects)\nconst items = $input.all();\n\n// Extract the 'text' from each item and build strings like \"GBPUSD Bullish\"\nconst pairs = items.map(item => {\n  const text = item.json.text;\n\n  // Extract the pair\n  const pairMatch = text.match(/([A-Z]{6})(?=:)/);\n  const pair = pairMatch ? pairMatch[1] : null;\n\n  // Extract the sentiment\n  const sentimentMatch = text.match(/:\\s*(Bullish|Bearish|Neutral)/i);\n  const sentiment = sentimentMatch ? sentimentMatch[1] : null;\n\n  if (pair && sentiment) {\n    return `${pair} ${sentiment}`;\n  }\n  return null;\n}).filter(Boolean); // Remove nulls\n\n// Return as array\nreturn [{ json: { pairs } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4a5eee41-49aa-49cb-8153-ceed7a4a9d18",
+      "name": "Forex news"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get inputs\nconst items = $input.all();\n\n// Prepare arrays\nconst pairs = [];\nconst titles = [];\n\n// Loop through items and check what they contain\nitems.forEach(item => {\n  if (item.json.pairs) {\n    pairs.push(...item.json.pairs);\n  }\n  if (item.json.titles) {\n    titles.push(...item.json.titles);\n  }\n});\n\n// Build final object\nreturn [{\n  json: {\n    pairs,\n    titles\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        100
+      ],
+      "id": "1d998f1b-cc8d-4dc3-9f3f-06ac3c422d5a",
+      "name": "Forex news1"
+    },
+    {
+      "parameters": {
+        "chatId": "-1002699752742",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        100
+      ],
+      "id": "dafa60d5-4bc4-4006-8a74-4ccd7f84c43d",
+      "name": "Telegram",
+      "webhookId": "54850908-2ce7-4059-8a9c-863775c7fd6f",
+      "credentials": {
+        "telegramApi": {
+          "id": "evmIGgH5gxsHNEdI",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        420
+      ],
+      "id": "4712ab86-e211-47a8-bae6-d42e3fc76952",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Anaalyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Anaalyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anaalyst": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Forex news",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Economic Indicator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Anaalyst1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anaalyst1": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Forex news1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Economic Indicator": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Forex news": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Forex news1": {
+      "main": [
+        [
+          {
+            "node": "Anaalyst1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "159f6490-2ff6-4099-9bd2-f64d8b87158a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cdc62a0b718753aeaac5b6138fe0fee75e8ddcff8239256aa2190d62035eeb70"
+  },
+  "id": "OsanEVFEYrb7Li0G",
+  "tags": []
+}

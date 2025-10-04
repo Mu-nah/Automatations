@@ -1,0 +1,469 @@
+{
+  "name": "Coinbase_binanceSites",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        520
+      ],
+      "id": "0fe024c0-ced3-4136-9c96-1460ec083735",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://r.jina.ai/https://www.binance.com/en/support/announcement/list/48",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer jina_34b2546d837e4c99bc82e792bd9c8ad2YMh7ky4hkrCpUf8orpNzQaSG2sN3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        -40
+      ],
+      "id": "182c9ad6-c9ff-4d2a-9ad3-f6b27768fdf4",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const markdown = items[0].json.data.markdown;\n\n// Match all announcements using regex: [**Title**](Link)\nconst regex = /\\[\\*\\*(.*?)\\*\\*\\]\\((.*?)\\)/g;\n\nlet match;\nconst announcements = [];\n\nwhile ((match = regex.exec(markdown)) !== null) {\n  announcements.push({\n    title: match[1],\n    url: match[2]\n  });\n}\n\n// Assume the first in the list is the latest (it is, based on structure)\nconst latestAnnouncement = announcements[0];\n\nreturn [\n  {\n    json: {\n      LatestTitle: latestAnnouncement.title,\n      LatestURL: latestAnnouncement.url\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        320
+      ],
+      "id": "a0ad3097-bbfd-4cd3-9c4b-a655ac26f30b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer fc-2ba5e732873d4d4d88e1f31e272ed34f"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://www.coinbase.com/blog\",\n  \"formats\": [\n    \"markdown\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -660,
+        720
+      ],
+      "id": "d1568dc8-840d-4d6c-ab74-8482ee56c3b3",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const markdown = items[0].json.data.markdown;\n\n// Match the first blog entry\nconst postRegex = /\\[!\\[([^\\]]+)\\]\\((https:\\/\\/[^\\)]+)\\)\\]\\((https:\\/\\/[^\\)]+)\\)[\\s\\S]*?(?:(?:\\[(.*?)\\]\\([^\\)]+\\))|([A-Za-z]+)),\\s*\\n+([A-Za-z]+\\s\\d{1,2},\\s*\\d{4})[\\s\\S]*?\\[\\*\\*(.*?)\\*\\*\\]\\((https:\\/\\/[^\\)]+)\\)/;\n\nconst match = markdown.match(postRegex);\n\nif (!match) {\n  return [{ json: { error: \"No match found\" } }];\n}\n\nconst result = {\n  title: match[7],\n  url: match[8],\n  date: match[6],\n  imageAlt: match[1],\n  imageUrl: match[2],\n  category: match[4] || match[5] || \"Unknown\"\n};\n\nreturn [{ json: result }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        720
+      ],
+      "id": "5958b724-34ee-4b99-a42e-1c91b800d522",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        88,
+        440
+      ],
+      "id": "552692dd-7f6a-4a60-9d70-e1535e6b8e42",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9xKJjJzDpFbc0F5Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "314041a8-7746-41ef-9e9b-d379b04993ab",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "no_impact",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        520
+      ],
+      "id": "0a3e9a2e-8858-48e0-b2c0-4fc164e32b47",
+      "name": "If2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        596,
+        620
+      ],
+      "id": "8aba3e53-690f-4d03-84d4-34c644289a90",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1368982623569055805",
+          "mode": "list",
+          "cachedResultName": "ready_signals",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1368982623569055805"
+        },
+        "content": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        596,
+        420
+      ],
+      "id": "181050b1-b1fc-449d-aad6-7325261fb25f",
+      "name": "Discord2",
+      "webhookId": "b2741aee-1028-4799-9e05-3c55ee6a4323",
+      "credentials": {
+        "discordBotApi": {
+          "id": "NKKMgALxrR178Vvm",
+          "name": "Xai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=You are a crypto news analyst. Carefully read the content below and identify only tokens that Binance will:\n\nlist (contain phrase: \"will list\"), or\n\nadd to roadmap (contain phrase: \"assets added to the roadmap\").\n\nOnly output tokens that meet both of these conditions:\n\nThe source is Binance Anouncement site.\n\nThe text clearly states a token will be listed or added to the roadmap using the exact phrases:\n\n“will list”\n\n“assets added to the roadmap”\n\nIgnore everything else, including:\n\ntokens being supported, airdropped, staked\n\navailability in countries or wallets\n\nupgrades or features\n\nIf no valid token listing or roadmap addition is found, return exactly: \"no_impact\" and nothing else.\n\nPosts content: {{ $json.text }}\n\nIf it is about a listing; output, for each token mentioned, only the following in plain text (no formatting or markdown):\n\n**New Token Listing (Binance site)**\nOverview:  [Short summary of what the tweet says]\nToken: [Mentioned Token Ticker]\nSentiment: [Bullish or Bearish]\n\nand nothing else."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        0,
+        220
+      ],
+      "id": "1757bab5-992d-4683-8285-ea6fde8a5706",
+      "name": "Analyst"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.LatestURL }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        320
+      ],
+      "id": "f374bf52-d44e-4159-972f-126260feae5b",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        720
+      ],
+      "id": "942618cf-2731-47f6-a4c3-c2693be138c5",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a crypto news analyst. Carefully read the content below and identify only tokens that Coinbase will:\n\nlist (contain phrase: \"will list\"), or\n\nadd to roadmap (contain phrase: \"assets added to the roadmap\").\n\nOnly output tokens that meet both of these conditions:\n\nThe source is Coinbase Anouncement site.\n\nThe text clearly states a token will be listed or added to the roadmap using the exact phrases:\n\n“will list”\n\n“assets added to the roadmap”\n\nIgnore everything else, including:\n\ntokens being supported, airdropped, staked\n\navailability in countries or wallets\n\nupgrades or features\n\nIf no valid token listing or roadmap addition is found, return exactly: \"no_impact\" and nothing else.\n\nPosts content: {{ $json.text }}\n\nIf it is about a listing; output, for each token mentioned, only the following in plain text (no formatting or markdown):\n\n**New Token Listing (Coinbase site)**\nOverview:  [Short summary of what the tweet says]\nToken: [Mentioned Token Ticker]\nSentiment: [Bullish or Bearish]\n\nand nothing else."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        0,
+        720
+      ],
+      "id": "0e7e4402-51a4-41c1-933c-bd3a0aa5a7b2",
+      "name": "Analyst1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        88,
+        940
+      ],
+      "id": "7154b18b-40b0-4228-b1a1-26f014582220",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9xKJjJzDpFbc0F5Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer fc-b795497df96a4c88b7e9dd0b44e08146"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"url\": \"https://www.binance.com/en/support/announcement/list/48\",\n  \"formats\": [\n    \"markdown\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -660,
+        320
+      ],
+      "id": "6ebaa6c6-a261-4ccd-a029-9a0a6f166264",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Discord2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Analyst1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "06238c10-7e84-403e-a06b-aeb5088c21f0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bd3fb2445c8d5240ef1fe92cf193d7e05c0fe42313f2bfa7af5644dbeaa225be"
+  },
+  "id": "0FWAjRnKfyLd69f0",
+  "tags": []
+}

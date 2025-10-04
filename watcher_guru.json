@@ -1,0 +1,359 @@
+{
+  "name": "watcher.guru",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://api.twitter.com/2/lists/1910104571533517226/tweets",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=max_results",
+              "value": "=1"
+            },
+            {
+              "name": "=tweet.fields",
+              "value": "=created_at,author_id,text"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer AAAAAAAAAAAAAAAAAAAAABT%2B0AEAAAAAp0bM6ce78nJPfPQMUAv%2Fc16aoeQ%3DVaibt0AcEhJLip1Oxn3cPigA2dJ00R1T0HJNeAV5NR4OmwyADu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1700,
+        300
+      ],
+      "id": "972f7be7-5bc6-45fd-b2fb-72fb9b0d86be",
+      "name": "HTTP Request",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const allData = $input.all();\n\nconst tweets = allData\n\t.flatMap(item => item.json.data || [])\n\t.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));\n\nif (!tweets.length) {\n\treturn [{ $node: false, reason: \"No tweets found\" }];\n}\n\nreturn tweets.map(tweet => ({\n\tid: tweet.id,\n\ttext: tweet.text,\n\tcreated_at: tweet.created_at,\n\tisNew: true\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1480,
+        300
+      ],
+      "id": "b0120f2f-aaf9-46d1-8042-de4b3658796e",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -952,
+        520
+      ],
+      "id": "a780128f-e910-46d6-8c91-2d4a368b6579",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cMoc0ohI5JSWPwkl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Does the following post mention or strongly imply that $500 billion or more in money, liquidity, capital, funds, or investment is entering or leaving a financial market?\n\nLook for direct mentions like \"$500B\", \"$1 trillion\", or indirect language implying large money flows (e.g., “massive liquidity”, “trillions moving”, “historic capital inflow”).\n\nOnly respond with:\n\n\"Yes\" \n\n\"No\" \n\nDo not explain. Do not summarize. Just return \"Yes\" or \"No\n\npost: {{ $('Code').item.json.text }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -1040,
+        300
+      ],
+      "id": "fb7c3a17-d822-48fb-aa15-7e511b61792b",
+      "name": "Analyst"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0ea17124-44ab-4afa-9cbd-d4e15cc292b0",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "=Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -664,
+        300
+      ],
+      "id": "3b75e800-4667-4e27-a30c-9ac346b0c104",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "onyebukwam@gmail.com, fejirohanu@gmail.com",
+        "subject": "🚨 Market Alert from Watcher.Guru",
+        "emailType": "text",
+        "message": "=👉 {{ $('Code').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -444,
+        200
+      ],
+      "id": "ede98418-f184-435e-8921-081a959a44b2",
+      "name": "Gmail",
+      "webhookId": "8400a302-2997-4286-bad8-59cf49bea439",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YSqblggTKdP7iafU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6684941670",
+        "text": "=🚨 Market Alert from Watcher.Guru\n\n👉 {{ $('Code').item.json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -444,
+        0
+      ],
+      "id": "d654cd04-a707-4541-930e-29e16d781f98",
+      "name": "Telegram",
+      "webhookId": "7a31b2f0-86ae-46cb-a1f2-8223f4227067",
+      "credentials": {
+        "telegramApi": {
+          "id": "vrmCJmWy5h5Bpg8R",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346284477692907570",
+          "mode": "list",
+          "cachedResultName": "XAgent",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1360695940712763442",
+          "mode": "list",
+          "cachedResultName": "watcherguru",
+          "cachedResultUrl": "https://discord.com/channels/1346284477692907570/1360695940712763442"
+        },
+        "content": "=🚨 Market Alert from Watcher.Guru\n\n👉 {{ $('Code').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -444,
+        400
+      ],
+      "id": "a2f0842a-489c-4fa2-bc12-b638fa46790b",
+      "name": "Discord",
+      "webhookId": "ebe6a044-3884-4bff-bb5f-b85833b7e75b",
+      "credentials": {
+        "discordBotApi": {
+          "id": "EAn4YO10ujDPWs2M",
+          "name": "XAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1920,
+        300
+      ],
+      "id": "d9946bc2-de0b-4b5d-892b-d9be3e7121af",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -444,
+        600
+      ],
+      "id": "503f5c6d-3123-4576-9b8d-1fd509e0e794",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -1260,
+        300
+      ],
+      "id": "f5ea18c9-53ab-4123-a944-a99d4faf8689",
+      "name": "Remove Duplicates"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyst": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cf9387e2-d45b-43f9-b699-6b32a9d3e9b0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cdc62a0b718753aeaac5b6138fe0fee75e8ddcff8239256aa2190d62035eeb70"
+  },
+  "id": "zq1F9kP8Wz8fksab",
+  "tags": []
+}

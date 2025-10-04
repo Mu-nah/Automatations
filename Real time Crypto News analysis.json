@@ -1,0 +1,310 @@
+{
+  "name": "CryptoNews",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        408,
+        140
+      ],
+      "id": "a10d6762-048e-4833-8bfe-cdd70c98c8c7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cMoc0ohI5JSWPwkl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional Crypto Market Analyst.\nI will give you real-time economic or financial news.\n\nYour task:\n\nAnalyze the news and determine if it has enough market-moving power to cause significant movement on the 30-minute chart.\n\nOnly respond if the news could lead to a potential trade setup on any Cryptocurrency pairs.\n\nFor each affected pair:\n\nMention if it’s Bullish 🟢, Bearish 📉, or Neutral ⚪.\nGive a short, clear justification.\nEstimate how long the sentiment might last (e.g., \"Expected to last 2-4 hours\" or \"Likely to impact markets for the next 1-2 sessions\").\nAssign an Impact Level: High 🔥, Medium ⚡, Low 💧.\n\nIf the news is not strong or relevant enough, output only:\nNo_signals and nothing else\n\n📌 Criteria for Qualified Crypto Trade News:\n\n- Macroeconomic Data Releases\n    U.S. CPI, NFP, PPI, GDP, unemployment, inflation surprises\n    Major central banks (Fed, ECB) interest rate decisions or guidance\n\n- Central Bank or Regulatory Announcements\n   SEC, CFTC, or Federal Reserve statements on crypto\n   Court rulings (e.g., ETF approvals, crypto lawsuits like Ripple)\n  Tax policy changes affecting crypto gains or DeFi\n\n- Geopolitical and Global Risk Events\n   Sanctions, war/conflict escalation, or cross-border tensions affecting markets\n   Global monetary instability (currency devaluations, inflation crises)\n   Nation-state-level crypto bans or adoption (e.g., El Salvador, Nigeria, U.S., \n   China)\n\n- Institutional or Whale Activity\n   Spot ETF flows (Bitcoin/Ethereum) or major custody/infrastructure moves\n   Large on-chain movements (>10,000 BTC/ETH)\n   Whale wallet tracking insights or smart money alerts\n\n- Market Sentiment Shifts\n   Crypto-specific FUD/FOMO (e.g., exchange hacks, Binance/Coinbase issues)\n   On-chain metrics signaling major inflows/outflows to exchanges\n   Viral social or media narratives (e.g., #BitcoinETF, \"flippening\")\n\n- DeFi, NFT, or L2 Breakthroughs\n   Major protocol upgrades (e.g., ETH hard forks, Solana restarts)\n   L2 scaling adoption (Base, Arbitrum, Optimism)\n   Partnerships with banks or institutions\n\n\nIgnore: Small, irrelevant, or unrelated events.\n\nAlways aim for concise but highly accurate output.\n\n🧾 News Input: {{ $json.titles }}\n\nOutput Format:\n\n***📢 Market Call from Crypto News 📢***\n{line break}\n\n***[PAIR]***: [🟢 Bullish | 🔴 Bearish | 🟡 Neutral] — [Concise justification].\n***Expected to last [Time Range]:*** [timeframe to trade]\n***Impact Level***: [High 🔥 | Medium ⚡ | Low 💧].\nIf the news is not significant:\n\nNo_signals and nothing else\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        320,
+        -80
+      ],
+      "id": "a077b490-7598-41c9-8b9f-87d92ae3a830",
+      "name": "Anaalyst"
+    },
+    {
+      "parameters": {
+        "chatId": "-1002699752742",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        916,
+        20
+      ],
+      "id": "00904591-0c01-4dd4-969d-576624265256",
+      "name": "Telegram",
+      "webhookId": "abccc88f-cf34-4da0-b983-d9bf155edc95",
+      "credentials": {
+        "telegramApi": {
+          "id": "evmIGgH5gxsHNEdI",
+          "name": "mybot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -780,
+        -80
+      ],
+      "id": "3cbdd675-61bd-4f05-9274-2554ec5a4b0b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the appropriate array from the JSON structure\nconst articles = $json.articles || $json.results || $json.filteredArticles || $json;\n\n// Return an array of individual items for Remove Duplicates node\nreturn articles.map(article => ({\n  json: {\n    title: article.title,\n    content: article.content,\n    time_published: article.publishedAt\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        -80
+      ],
+      "id": "03aa3de4-0cfa-4af9-afe7-ef1cb94c4e87",
+      "name": "Filter News"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.time_published }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        -80
+      ],
+      "id": "c27f89bd-8252-4ba3-9adc-e0ed193740ae",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c9058376-8b96-4d80-b491-b2a4b8158705",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "No_signals",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        -80
+      ],
+      "id": "cb554737-a335-41c1-8da2-aae177ed18eb",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        916,
+        -180
+      ],
+      "id": "268c16f7-e420-4ef8-a2cd-9dd933306c44",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract titles from each item\nconst titlesArray = items.map(item => item.json.title);\n\n// Return a single item with all titles in an array\nreturn [\n  {\n    json: {\n      titles: titlesArray\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        -80
+      ],
+      "id": "75257b21-dadf-473a-ae4b-36be5bdbeb6d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "Crypto OR Bitcoin OR Coindesk"
+            },
+            {
+              "name": "from",
+              "value": "={{new Date(Date.now()-3*24*60*60*100).toISOString().split('T')[0]}}"
+            },
+            {
+              "name": "sortby",
+              "value": "=popularity"
+            },
+            {
+              "name": "apikey",
+              "value": "93cf6a902e394c78a631d7725e238fd0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        -80
+      ],
+      "id": "b66a9c93-1374-4dd8-8a9e-da807e8faab6",
+      "name": "Crypto News1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Anaalyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anaalyst": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Crypto News1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter News": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Anaalyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto News1": {
+      "main": [
+        [
+          {
+            "node": "Filter News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ce4c3dd8-9512-4066-b32a-48f572d8e5e8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cdc62a0b718753aeaac5b6138fe0fee75e8ddcff8239256aa2190d62035eeb70"
+  },
+  "id": "lAT6W4jo6JY16osE",
+  "tags": []
+}
