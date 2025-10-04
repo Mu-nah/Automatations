@@ -12,7 +12,7 @@
           },
           "conditions": [
             {
-              "id": "0ea17124-44ab-4afa-9cbd-d4e15cc292b0",
+              "id": "",
               "leftValue": "={{ $json.text }}",
               "rightValue": "=Yes",
               "operator": {
@@ -37,7 +37,7 @@
     },
     {
       "parameters": {
-        "sendTo": "foundersoffice@secondmountainhq.com, fejirohanu@gmail.com",
+        "sendTo": "gmail.com",
         "subject": "🚨 Market Alert from Watcher.Guru",
         "emailType": "text",
         "message": "=👉 {{ $('Watcher.guru').item.json.tweet }} [TEST]",
@@ -51,7 +51,7 @@
       ],
       "id": "22ce116e-0551-4d97-a258-322f18184914",
       "name": "Gmail",
-      "webhookId": "c4259848-670e-4ef9-abbf-bea2a3f9d81b",
+      "webhookId": "",
       "credentials": {
         "gmailOAuth2": {
           "id": "2uHjOLesJ6Kqa3lv",
@@ -61,7 +61,7 @@
     },
     {
       "parameters": {
-        "chatId": "6684941670",
+        "chatId": "",
         "text": "=🚨 Market Alert from Watcher.Guru (TEST)\n\n👉 {{ $('Watcher.guru').item.json.tweet }} ",
         "additionalFields": {}
       },
